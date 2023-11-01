@@ -1,0 +1,12 @@
+[package]
+name = "modeler"
+version = "0.1.0"
+description = "3D modeling app in opengl for CMPSC 457"
+authors = ["Patrick Miller"]
+repository = "https://github.com/paddymills/modeler-rs"
+keywords = ["OpenGL", "3D Modeling"]
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
