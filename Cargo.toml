@@ -1,5 +1,5 @@
 [package]
-name = "modeler"
+name = "phobia"
 version = "0.1.0"
 description = "3D modeling app in opengl for CMPSC 457"
 authors = ["Patrick Miller"]
@@ -16,3 +16,7 @@ glutin = "0.29.1"
 gl = "0.14.0"
 ftlog = "0.2.10"
 thiserror = "1.0.50"
+
+[[bin]]
+name = "phobia"
+path = "src/bin/modeler.rs"

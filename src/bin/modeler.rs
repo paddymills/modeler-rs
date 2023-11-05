@@ -1,6 +1,4 @@
-mod renderer;
-
-use crate::renderer::Renderer;
+use phobia::renderer::Renderer;
 use glutin::event::{Event, WindowEvent};
 use glutin::event_loop::{ControlFlow, EventLoop};
 use glutin::window::WindowBuilder;
@@ -8,7 +6,7 @@ use glutin::{Api, ContextBuilder, GlRequest};
 
 fn main() {
     let event_loop = EventLoop::new();
-    let window = WindowBuilder::new().with_title("Phobia");
+    let window = WindowBuilder::new().with_title(phobia::config::TITLE);
 
     let gl_context = ContextBuilder::new()
         .with_gl(GlRequest::Specific(Api::OpenGl, (3, 3)))
