@@ -21,3 +21,6 @@ Requires a rust toolchain to be installed. Get one at [here](https://rustup.rs/)
     - [ ] Save format
     - [ ] Export to .stl
 
+
+# Resources
+- [Learn OpenGL with Rust Series'](https://dev.to/samkevich/learn-opengl-with-rust-creating-a-window-1792)
