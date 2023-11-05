@@ -4,7 +4,7 @@ A 3D modeling app in OpenGL, written in rust
 
 # Building
 
-Requires a rust toolchain to be installed. Get one at [here](https://rustup.rs/).
+Requires a rust toolchain to be installed. Get one [here](https://rustup.rs/).
 
 ## Development
 `cargo run`
