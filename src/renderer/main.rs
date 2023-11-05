@@ -8,7 +8,7 @@ use glutin::{Api, ContextBuilder, GlRequest};
 
 fn main() {
     let event_loop = EventLoop::new();
-    let window = WindowBuilder::new().with_title("Phobia");
+    let window = WindowBuilder::new().with_title("Learn OpenGL with Rust");
 
     let gl_context = ContextBuilder::new()
         .with_gl(GlRequest::Specific(Api::OpenGl, (3, 3)))
