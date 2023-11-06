@@ -14,10 +14,12 @@ type Color = [f32; 3];
 struct Vertex(Pos, Color);
 
 #[rustfmt::skip]
-const VERTICES: [Vertex; 3] = [
+const VERTICES: [Vertex; 5] = [
     Vertex([-0.5, -0.5], [1.0, 0.0, 0.0]),
     Vertex([0.5,  -0.5], [0.0, 1.0, 0.0]),
-    Vertex([0.0,   0.5], [0.0, 0.0, 1.0])
+    Vertex([0.5,   0.5], [0.0, 0.0, 1.0]),
+    Vertex([0.0,   0.75], [0.0, 0.0, 1.0]),
+    Vertex([-0.5,  0.5], [0.0, 0.0, 1.0]),
 ];
 
 pub struct Renderer {
@@ -54,7 +56,8 @@ impl Renderer {
             gl::Clear(gl::COLOR_BUFFER_BIT);
             self.program.apply();
             self.vertex_array.bind();
-            gl::DrawArrays(gl::TRIANGLES, 0, 3);
+            // gl::DrawArrays(gl::LINE_LOOP, 0, VERTICES.len() as i32);
+            gl::DrawArrays(gl::TRIANGLE_STRIP, 0, VERTICES.len() as i32);
         }
     }
 }
