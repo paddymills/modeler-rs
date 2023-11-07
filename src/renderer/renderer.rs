@@ -31,6 +31,10 @@ pub struct Renderer {
 impl Renderer {
     pub fn new() -> Result<Self, ShaderError> {
         unsafe {
+            gl::Enable(gl::BLEND);
+            gl::BlendFunc(gl::SRC_ALPHA, gl::ONE_MINUS_SRC_ALPHA);
+            gl::Enable(gl::LINE_SMOOTH);
+
             let vertex_shader = Shader::new(VERTEX_SHADER_SOURCE, gl::VERTEX_SHADER)?;
             let fragment_shader = Shader::new(FRAGMENT_SHADER_SOURCE, gl::FRAGMENT_SHADER)?;
             let program = ShaderProgram::new(&[vertex_shader, fragment_shader])?;
@@ -54,10 +58,10 @@ impl Renderer {
         unsafe {
             gl::ClearColor(0.3, 0.3, 0.3, 1.0);
             gl::Clear(gl::COLOR_BUFFER_BIT);
+            gl::LineWidth(2.5);
             self.program.apply();
             self.vertex_array.bind();
-            // gl::DrawArrays(gl::LINE_LOOP, 0, VERTICES.len() as i32);
-            gl::DrawArrays(gl::TRIANGLE_STRIP, 0, VERTICES.len() as i32);
+            gl::DrawArrays(gl::LINE_LOOP, 0, VERTICES.len() as i32);
         }
     }
 }
