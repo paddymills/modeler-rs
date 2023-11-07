@@ -28,7 +28,10 @@ fn main() {
         match event {
             Event::LoopDestroyed => (),
             Event::WindowEvent { event, .. } => match event {
-                WindowEvent::Resized(physical_size) => gl_context.resize(physical_size),
+                WindowEvent::Resized(physical_size) => {
+                    gl_context.resize(physical_size);
+                    gl_context.window().request_redraw();
+                },
                 WindowEvent::CloseRequested => *control_flow = ControlFlow::Exit,
                 _ => (),
             },
