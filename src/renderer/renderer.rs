@@ -11,6 +11,7 @@ type Pos = [f32; 2];
 type Color = [f32; 3];
 
 #[repr(C, packed)]
+#[derive(Debug)]
 struct Vertex(Pos, Color);
 
 // #[rustfmt::skip]
@@ -22,6 +23,7 @@ struct Vertex(Pos, Color);
 //     Vertex([-0.5,  0.5], [0.0, 0.0, 1.0]),
 // ];
 
+#[derive(Debug)]
 pub struct Renderer {
     program: ShaderProgram,
     _vertex_buffer: Buffer,

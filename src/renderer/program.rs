@@ -2,6 +2,7 @@ use crate::renderer::shader::{Shader, ShaderError};
 use gl::types::*;
 use std::ffi::{CString, NulError};
 
+#[derive(Debug)]
 pub struct ShaderProgram {
     pub id: GLuint,
 }
