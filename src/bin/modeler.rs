@@ -1,5 +1,5 @@
 use phobia::renderer::Renderer;
-use glutin::event::{Event, WindowEvent};
+use glutin::event::{Event, WindowEvent, ElementState, MouseButton};
 use glutin::event_loop::{ControlFlow, EventLoop};
 use glutin::window::WindowBuilder;
 use glutin::{Api, ContextBuilder, GlRequest};
@@ -20,8 +20,11 @@ fn main() {
     };
 
     gl::load_with(|ptr| gl_context.get_proc_address(ptr) as *const _);
-
-    let renderer = Renderer::new().expect("Cannot create renderer");
+    
+    // TODO: mouse handler to struct
+    let (mut x, mut y) = (0f32, 0f32);
+    
+    let mut renderer = Renderer::new().expect("Cannot create renderer");
     event_loop.run(move |event, _, control_flow| {
         *control_flow = ControlFlow::Wait;
 
@@ -33,6 +36,18 @@ fn main() {
                     gl_context.window().request_redraw();
                 },
                 WindowEvent::CloseRequested => *control_flow = ControlFlow::Exit,
+                WindowEvent::CursorMoved { position, .. } => {
+                    x = position.x as f32;
+                    y = position.y as f32;
+                },
+                WindowEvent::MouseInput { state: ElementState::Released, button: MouseButton::Left, .. } => {
+                    let win = gl_context.window().inner_size();
+                    let x = -1. + 2. * x / win.width  as f32;
+                    let y =  1. - 2. * y / win.height as f32;
+
+                    renderer.add_point(x, y);
+                    gl_context.window().request_redraw();
+                },
                 _ => (),
             },
             Event::RedrawRequested(_) => {
