@@ -1,4 +1,5 @@
 
+pub mod controls;
 pub mod renderer;
 
 pub mod config {
