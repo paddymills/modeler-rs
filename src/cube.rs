@@ -1,5 +1,5 @@
 
-use glium::{program, uniform};
+use glium::uniform;
 use glium::{Display, Surface};
 use glium::glutin::surface::WindowSurface;
 use crate::support::{self, ApplicationContext};
