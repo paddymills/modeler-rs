@@ -1,8 +1,7 @@
 
 use phobia::support::State;
-use phobia::teapot::Application;
 
 fn main() {
-    State::<Application>::run_loop();
+    State::<phobia::cube::Application>::run_loop();
 }
 
