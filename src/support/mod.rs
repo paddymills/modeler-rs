@@ -14,7 +14,6 @@ use glutin::display::{GlDisplay, GetGlDisplay};
 use winit::raw_window_handle::HasRawWindowHandle;
 
 pub mod camera;
-pub mod teapot;
 
 /// Returns a vertex buffer that should be rendered as `TrianglesList`.
 pub fn load_wavefront(display: &Display<WindowSurface>, data: &[u8]) -> glium::vertex::VertexBufferAny {
