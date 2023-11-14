@@ -10,12 +10,9 @@ pub struct CameraState {
     moving_forward: bool,
     moving_backward: bool,
 
-    rotating_up: bool,
-    rotating_left: bool,
-    rotating_down: bool,
-    rotating_right: bool,
-    rotating_forward: bool,
-    rotating_backward: bool,
+    rotating: (i8, i8, i8),
+    rotation: (f32, f32, f32)
+
 }
 
 impl CameraState {
@@ -32,12 +29,8 @@ impl CameraState {
             moving_forward: false,
             moving_backward: false,
 
-            rotating_up: false,
-            rotating_left: false,
-            rotating_down: false,
-            rotating_right: false,
-            rotating_forward: false,
-            rotating_backward: false,
+            rotating: (0, 0, 0),
+            rotation: (0.0, 0.0, 0.0)
         }
     }
 
@@ -108,6 +101,36 @@ impl CameraState {
         ]
     }
 
+    pub fn get_x_rotation(&self) -> [[f32; 4]; 4] {
+        let r = self.rotation.0;
+        [
+            [1.0,     0.0,      0.0, 0.0],
+            [0.0, r.cos(), -r.sin(), 0.0],
+            [0.0, r.sin(),  r.cos(), 0.0],
+            [0.0,     0.0,      0.0, 1.0],
+        ]
+    }
+
+    pub fn get_y_rotation(&self) -> [[f32; 4]; 4] {
+        let r = self.rotation.1;
+        [
+            [ r.cos(), 0.0, r.sin(), 0.0],
+            [     0.0, 1.0,     0.0, 0.0],
+            [-r.sin(), 0.0, r.cos(), 0.0],
+            [     0.0, 0.0,     0.0, 1.0],
+        ]
+    }
+
+    pub fn get_z_rotation(&self) -> [[f32; 4]; 4] {
+        let r = self.rotation.2;
+        [
+            [r.cos(), -r.sin(), 0.0, 0.0],
+            [r.sin(),  r.cos(), 0.0, 0.0],
+            [    0.0,      0.0, 1.0, 0.0],
+            [    0.0,      0.0, 0.0, 1.0],
+        ]
+    }
+
     pub fn update(&mut self) {
         let f = {
             let f = self.direction;
@@ -172,12 +195,9 @@ impl CameraState {
             self.position.2 -= f.2 * 0.01;
         }
 
-        if self.rotating_left {
-            self.position.0 += 0.01
-        }
-        if self.rotating_right {
-            self.position.0 -= 0.01
-        }
+        self.rotation.0 += (self.rotating.0 as f32) * 0.01;
+        self.rotation.1 += (self.rotating.1 as f32) * 0.01;
+        self.rotation.2 += (self.rotating.2 as f32) * 0.01;
     }
 
     pub fn process_input(&mut self, event: &winit::event::WindowEvent) {
@@ -185,16 +205,23 @@ impl CameraState {
         let winit::event::WindowEvent::KeyboardInput { event, .. } = event else {
             return
         };
+
         let pressed = event.state == winit::event::ElementState::Pressed;
         match &event.physical_key {
-            PhysicalKey::Code(KeyCode::ArrowUp) => self.moving_up = pressed,
-            PhysicalKey::Code(KeyCode::ArrowDown) => self.moving_down = pressed,
-            PhysicalKey::Code(KeyCode::ArrowLeft) => self.rotating_left = pressed,
-            PhysicalKey::Code(KeyCode::ArrowRight) => self.rotating_right = pressed,
-            PhysicalKey::Code(KeyCode::KeyA) => self.moving_left = pressed,
-            PhysicalKey::Code(KeyCode::KeyD) => self.moving_right = pressed,
-            PhysicalKey::Code(KeyCode::KeyW) => self.moving_forward = pressed,
-            PhysicalKey::Code(KeyCode::KeyS) => self.moving_backward = pressed,
+            // movement
+            PhysicalKey::Code(KeyCode::ArrowUp)    => self.moving_up = pressed,
+            PhysicalKey::Code(KeyCode::ArrowDown)  => self.moving_down = pressed,
+            PhysicalKey::Code(KeyCode::KeyA)       => self.moving_left = pressed,
+            PhysicalKey::Code(KeyCode::KeyD)       => self.moving_right = pressed,
+            PhysicalKey::Code(KeyCode::KeyW)       => self.moving_forward = pressed,
+            PhysicalKey::Code(KeyCode::KeyS)       => self.moving_backward = pressed,
+
+            // rotation
+            PhysicalKey::Code(KeyCode::ArrowLeft)  => self.rotating.1 = -(pressed as i8),
+            PhysicalKey::Code(KeyCode::ArrowRight) => self.rotating.1 =  (pressed as i8),
+            PhysicalKey::Code(KeyCode::Digit1)  => self.rotating.0 = (pressed as i8),
+            PhysicalKey::Code(KeyCode::Digit2)  => self.rotating.1 = (pressed as i8),
+            PhysicalKey::Code(KeyCode::Digit3)  => self.rotating.2 = (pressed as i8),
             _ => (),
         };
     }

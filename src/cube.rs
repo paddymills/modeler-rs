@@ -33,18 +33,12 @@ impl ApplicationContext for Application {
     fn draw_frame(&mut self, display: &Display<WindowSurface>) {
         let mut frame = display.draw();
         // building the uniforms
-        let t = 0.1f32;
         let uniforms = uniform! {
             persp_matrix: self.camera.get_perspective(),
             view_matrix: self.camera.get_view(),
-
-            // TODO: get this to work. Maybe use this for all transformations
-            matrix: [
-                [ t.cos(), t.sin(), 0.0, 0.0],
-                [-t.sin(), t.cos(), 0.0, 0.0],
-                [0.0, 0.0, 1.0, 0.0],
-                [0.0, 0.0, 0.0, 1.0f32],
-            ]
+            rotx_matrix: self.camera.get_x_rotation(),
+            roty_matrix: self.camera.get_y_rotation(),
+            rotz_matrix: self.camera.get_z_rotation(),
         };
 
         // draw parameters
