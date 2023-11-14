@@ -30,7 +30,7 @@ impl CameraState {
             moving_backward: false,
 
             rotating: (0, 0, 0),
-            rotation: (0.0, 0.0, 0.0)
+            rotation: (0.5, 1.0, 0.0)
         }
     }
 
@@ -222,6 +222,10 @@ impl CameraState {
             PhysicalKey::Code(KeyCode::Digit1)  => self.rotating.0 = (pressed as i8),
             PhysicalKey::Code(KeyCode::Digit2)  => self.rotating.1 = (pressed as i8),
             PhysicalKey::Code(KeyCode::Digit3)  => self.rotating.2 = (pressed as i8),
+
+            // reset rotation
+            PhysicalKey::Code(KeyCode::KeyR) => self.rotation = (0.5, 1.0, 0.0),
+
             _ => (),
         };
     }
