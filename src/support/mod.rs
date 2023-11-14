@@ -102,6 +102,9 @@ impl<T: ApplicationContext + 'static> State<T> {
         let event_loop = winit::event_loop::EventLoopBuilder::new()
             .build()
             .expect("event loop building");
+        let (window, display) = glium::backend::glutin::SimpleWindowBuilder::new()
+            .with_title(crate::config::TITLE)
+            .build(&event_loop);
         let mut state: Option<State<T>> = None;
 
         let result = event_loop.run(move |event, window_target| {
