@@ -104,28 +104,28 @@ impl CameraState {
     pub fn get_x_rotation(&self) -> [[f32; 4]; 4] {
         let r = self.rotation.0;
         [
-            [1.0,     0.0,      0.0, 0.0],
-            [0.0, r.cos(), -r.sin(), 0.0],
-            [0.0, r.sin(),  r.cos(), 0.0],
-            [0.0,     0.0,      0.0, 1.0],
+            [1.0,      0.0,     0.0, 0.0],
+            [0.0,  r.cos(), r.sin(), 0.0],
+            [0.0, -r.sin(), r.cos(), 0.0],
+            [0.0,      0.0,     0.0, 1.0],
         ]
     }
 
     pub fn get_y_rotation(&self) -> [[f32; 4]; 4] {
         let r = self.rotation.1;
         [
-            [ r.cos(), 0.0, r.sin(), 0.0],
-            [     0.0, 1.0,     0.0, 0.0],
-            [-r.sin(), 0.0, r.cos(), 0.0],
-            [     0.0, 0.0,     0.0, 1.0],
+            [r.cos(), 0.0, -r.sin(), 0.0],
+            [    0.0, 1.0,      0.0, 0.0],
+            [r.sin(), 0.0,  r.cos(), 0.0],
+            [    0.0, 0.0,      0.0, 1.0],
         ]
     }
 
     pub fn get_z_rotation(&self) -> [[f32; 4]; 4] {
         let r = self.rotation.2;
-        [
-            [r.cos(), -r.sin(), 0.0, 0.0],
-            [r.sin(),  r.cos(), 0.0, 0.0],
+       [
+            [ r.cos(), r.sin(), 0.0, 0.0],
+            [-r.sin(), r.cos(), 0.0, 0.0],
             [    0.0,      0.0, 1.0, 0.0],
             [    0.0,      0.0, 0.0, 1.0],
         ]
