@@ -12,8 +12,9 @@ fn main() {
         .with_title("cube example")
         .build(&event_loop);
 
-        let vertex_buffer = load_wavefront(&display, include_bytes!("../src/obj/cube.obj"));
+    let mut camera = phobia::support::camera::CameraState::new();
 
+    let vertex_buffer = load_wavefront(&display, include_bytes!("../src/obj/cube.obj"));
     let vertex_shader_src = r#"
         #version 150
 
@@ -70,7 +71,6 @@ fn main() {
                     ];
 
                     let view = view_matrix(&[2.0, -1.0, 1.0], &[-2.0, 1.0, 1.0], &[0.0, 1.0, 0.0]);
-
                     let perspective = {
                         let (width, height) = target.get_dimensions();
                         let aspect_ratio = height as f32 / width as f32;
@@ -88,6 +88,9 @@ fn main() {
                             [         0.0         ,    0.0, -(2.0*zfar*znear)/(zfar-znear),   0.0],
                         ]
                     };
+
+                    // let view = camera.get_view();
+                    // let perspective = camera.get_perspective();
 
                     let light = [-1.0, 0.4, 0.9f32];
 
@@ -114,11 +117,15 @@ fn main() {
                 winit::event::WindowEvent::Resized(window_size) => {
                     display.resize(window_size.into());
                 },
+                winit::event::WindowEvent::KeyboardInput { .. } => {
+                    camera.process_input(&event)
+                }
                 _ => (),
             },
             // By requesting a redraw in response to a AboutToWait event we get continuous rendering.
             // For applications that only change due to user input you could remove this handler.
             winit::event::Event::AboutToWait => {
+                camera.update();
                 window.request_redraw();
             },
             _ => (),
