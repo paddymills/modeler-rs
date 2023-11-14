@@ -1,9 +1,20 @@
 
+// stop the compiler from yelling for a minute
+// TODO: remove this
+#![allow(unused, deprecated)]
+
+use std::num::NonZeroU32;
+
 use glium::implement_vertex;
 use glium::{self, Display};
 use glium::glutin::surface::WindowSurface;
 
+use glutin::context::NotCurrentGlContext;
+use glutin::display::{GlDisplay, GetGlDisplay};
+use winit::raw_window_handle::HasRawWindowHandle;
+
 pub mod camera;
+pub mod teapot;
 
 /// Returns a vertex buffer that should be rendered as `TrianglesList`.
 pub fn load_wavefront(display: &Display<WindowSurface>, data: &[u8]) -> glium::vertex::VertexBufferAny {
@@ -96,16 +107,32 @@ pub struct State<T> {
 }
 
 impl<T: ApplicationContext + 'static> State<T> {
+    pub fn new(event_loop: &winit::event_loop::EventLoop<()>) -> Self {
+        let (window, display) = glium::backend::glutin::SimpleWindowBuilder::new()
+            .with_title(crate::config::TITLE)
+            .build(event_loop);
+
+        Self::from_display_window(display, window)
+    }
+
+    pub fn from_display_window(
+        display: glium::Display<WindowSurface>,
+        window: winit::window::Window,
+    ) -> Self {
+        let context = T::new(&display);
+        Self {
+            display,
+            window,
+            context,
+        }
+    }
 
     /// Start the event_loop and keep rendering frames until the program is closed
     pub fn run_loop() {
         let event_loop = winit::event_loop::EventLoopBuilder::new()
             .build()
             .expect("event loop building");
-        let (window, display) = glium::backend::glutin::SimpleWindowBuilder::new()
-            .with_title(crate::config::TITLE)
-            .build(&event_loop);
-        let mut state: Option<State<T>> = None;
+        let mut state: Option<State<T>> = Some(State::new(&event_loop));
 
         let result = event_loop.run(move |event, window_target| {
             match event {

@@ -11,10 +11,10 @@ pub struct Application {
 }
 
 impl ApplicationContext for Application {
-    const WINDOW_TITLE:&'static str = "Glium teapot example";
+    const WINDOW_TITLE:&'static str = "3d Modeler";
 
     fn new(display: &Display<WindowSurface>) -> Self {
-        let vertex_buffer = support::load_wavefront(&display, include_bytes!("support/teapot.obj"));
+        let vertex_buffer = support::load_wavefront(&display, include_bytes!("obj/teapot.obj"));
         let program = program!(display,
             140 => {
                 vertex: "
