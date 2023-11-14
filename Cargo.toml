@@ -13,7 +13,7 @@ edition = "2021"
 glutin = "0.31"
 glutin-winit = "0.4"
 # glium = "0.33.0"
-glium = { version = "0.33", path = "../glium" }
+glium = { version = "0.33", git = "https://github.com/glium/glium" }
 winit = "0.29"
 
 obj = { version = "0.10", features = ["genmesh"] }
