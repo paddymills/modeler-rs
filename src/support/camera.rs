@@ -9,6 +9,13 @@ pub struct CameraState {
     moving_right: bool,
     moving_forward: bool,
     moving_backward: bool,
+
+    rotating_up: bool,
+    rotating_left: bool,
+    rotating_down: bool,
+    rotating_right: bool,
+    rotating_forward: bool,
+    rotating_backward: bool,
 }
 
 impl CameraState {
@@ -17,12 +24,20 @@ impl CameraState {
             aspect_ratio: 1024.0 / 768.0,
             position: (0.1, 0.1, 1.0),
             direction: (0.0, 0.0, -1.0),
+            
             moving_up: false,
             moving_left: false,
             moving_down: false,
             moving_right: false,
             moving_forward: false,
             moving_backward: false,
+
+            rotating_up: false,
+            rotating_left: false,
+            rotating_down: false,
+            rotating_right: false,
+            rotating_forward: false,
+            rotating_backward: false,
         }
     }
 
@@ -146,6 +161,13 @@ impl CameraState {
             self.position.1 -= f.1 * 0.01;
             self.position.2 -= f.2 * 0.01;
         }
+
+        if self.rotating_left {
+            self.direction.0 += 0.01
+        }
+        if self.rotating_right {
+            self.direction.0 -= 0.01
+        }
     }
 
     pub fn process_input(&mut self, event: &winit::event::WindowEvent) {
@@ -157,6 +179,8 @@ impl CameraState {
         match &event.physical_key {
             PhysicalKey::Code(KeyCode::ArrowUp) => self.moving_up = pressed,
             PhysicalKey::Code(KeyCode::ArrowDown) => self.moving_down = pressed,
+            PhysicalKey::Code(KeyCode::ArrowLeft) => self.rotating_left = pressed,
+            PhysicalKey::Code(KeyCode::ArrowRight) => self.rotating_right = pressed,
             PhysicalKey::Code(KeyCode::KeyA) => self.moving_left = pressed,
             PhysicalKey::Code(KeyCode::KeyD) => self.moving_right = pressed,
             PhysicalKey::Code(KeyCode::KeyW) => self.moving_forward = pressed,
