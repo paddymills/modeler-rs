@@ -1,4 +1,5 @@
 
+pub const UPDATE_DISTANCE: f32 = 0.01;
 const UP: (f32, f32, f32) = (0.0, 1.0, 0.0);
 
 pub struct CameraState {
@@ -22,6 +23,10 @@ impl CameraState {
             moving: (0, 0, 0),
             rotating: (0, 0, 0),
         }
+    }
+
+    pub fn set_aspect_ratio(&mut self, x: f32, y: f32) {
+        self.aspect_ratio = x / y
     }
 
     pub fn set_position(&mut self, pos: (f32, f32, f32)) {
@@ -119,7 +124,7 @@ impl CameraState {
         ]
     }
 
-    pub fn update(&mut self) {
+    pub fn update(&mut self, dist: f32) {
         let f = {
             let f = self.direction;
             let len = f.0 * f.0 + f.1 * f.1 + f.2 * f.2;
@@ -151,33 +156,33 @@ impl CameraState {
 
         // x-axis: left/right
         if self.moving.0 != 0 {
-            self.position.0 += s.0 * 0.01 * (self.moving.0 as f32);
-            self.position.1 += s.1 * 0.01 * (self.moving.0 as f32);
-            self.position.2 += s.2 * 0.01 * (self.moving.0 as f32);
+            self.position.0 += s.0 * dist * (self.moving.0 as f32);
+            self.position.1 += s.1 * dist * (self.moving.0 as f32);
+            self.position.2 += s.2 * dist * (self.moving.0 as f32);
         }
 
         // y-axis: front/back
         if self.moving.1 != 0 {
-            self.position.0 += f.0 * 0.01 * (self.moving.1 as f32);
-            self.position.1 += f.1 * 0.01 * (self.moving.1 as f32);
-            self.position.2 += f.2 * 0.01 * (self.moving.1 as f32);
+            self.position.0 += f.0 * dist * (self.moving.1 as f32);
+            self.position.1 += f.1 * dist * (self.moving.1 as f32);
+            self.position.2 += f.2 * dist * (self.moving.1 as f32);
         }
 
         // z-axis: up/down
         if self.moving.2 != 0 {
-            self.position.0 += u.0 * 0.01 * (self.moving.2 as f32);
-            self.position.1 += u.1 * 0.01 * (self.moving.2 as f32);
-            self.position.2 += u.2 * 0.01 * (self.moving.2 as f32);
+            self.position.0 += u.0 * dist * (self.moving.2 as f32);
+            self.position.1 += u.1 * dist * (self.moving.2 as f32);
+            self.position.2 += u.2 * dist * (self.moving.2 as f32);
         }
 
-        self.rotation.0 += (self.rotating.0 as f32) * 0.01;
-        self.rotation.1 += (self.rotating.1 as f32) * 0.01;
-        self.rotation.2 += (self.rotating.2 as f32) * 0.01;
+        self.rotation.0 += (self.rotating.0 as f32) * dist;
+        self.rotation.1 += (self.rotating.1 as f32) * dist;
+        self.rotation.2 += (self.rotating.2 as f32) * dist;
     }
 
     pub fn process_input(&mut self, event: &winit::event::WindowEvent) {
         use winit::{
-            event::{WindowEvent, ElementState},
+            event::{WindowEvent, ElementState, MouseScrollDelta},
             keyboard::{PhysicalKey, KeyCode}
         };
         
@@ -206,10 +211,23 @@ impl CameraState {
                     _ => (),
                 }
             },
-            WindowEvent::CursorMoved { position, .. } => todo!(),
-            WindowEvent::MouseInput { button, state, .. } => todo!(),
-            WindowEvent::MouseWheel { delta, phase, .. } => todo!(),
-            WindowEvent::Resized(size) => self.aspect_ratio = size.width as f32 / size.height as f32,
+            // WindowEvent::CursorMoved { position, .. } => todo!(),
+            // WindowEvent::MouseInput { button, state, .. } => todo!(),
+            WindowEvent::MouseWheel { delta, .. } => {
+                let (x, y) = match delta {
+                    MouseScrollDelta::LineDelta(x, y) => (*x, *y),
+                    MouseScrollDelta::PixelDelta(size) => (size.x as f32, size.y as f32)
+                };
+
+                // TODO: refactor to impl this better
+                self.moving.0 = (x / x.abs()) as i8;
+                self.update(x.abs());
+                self.moving.0 = 0;
+                self.moving.1 = (y / y.abs()) as i8;
+                self.update(y.abs());
+                self.moving.1 = 0;
+            },
+            WindowEvent::Resized(size) => self.set_aspect_ratio( size.width as f32, size.height as f32 ),
             _ => ()
         }
     }

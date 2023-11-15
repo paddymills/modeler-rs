@@ -1,7 +1,10 @@
 
+use support::camera::CameraState;
+
 use glium::uniform;
 use glium::{Display, Surface};
 use glium::glutin::surface::WindowSurface;
+use crate::support::camera;
 use crate::{
     shaders,
     support::{self, ApplicationContext}
@@ -10,7 +13,7 @@ use crate::{
 pub struct Application {
     pub vertex_buffer: glium::vertex::VertexBufferAny,
     pub program: glium::Program,
-    pub camera: support::camera::CameraState,
+    pub camera: CameraState,
 }
 
 impl ApplicationContext for Application {
@@ -23,12 +26,10 @@ impl ApplicationContext for Application {
             display, shaders::VERTEX_SRC, shaders::FRAGMENT_SRC, None
         ).unwrap();
 
-        let camera = support::camera::CameraState::new();
-
         Self {
             vertex_buffer,
             program,
-            camera,
+            camera: CameraState::new(),
         }
     }
 
@@ -71,6 +72,6 @@ impl ApplicationContext for Application {
     }
 
     fn update(&mut self) {
-        self.camera.update();
+        self.camera.update(camera::UPDATE_DISTANCE);
     }
 }
