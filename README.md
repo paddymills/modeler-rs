@@ -21,6 +21,11 @@ Requires a rust toolchain to be installed. Get one [here](https://rustup.rs/).
     - [ ] Save format
     - [ ] Export to .stl
 
+# Midway Feedback
+- [ ] movement acceleration
 
 # Resources
+- [Learn OpenGL](https://learnopengl.com/)
 - [Learn OpenGL with Rust Series'](https://dev.to/samkevich/learn-opengl-with-rust-creating-a-window-1792)
+- [Glium tutorial](https://glium.github.io/glium/book/README.html)
+- [GL Matrices](https://www.songho.ca/opengl/gl_camera.html)
