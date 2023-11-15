@@ -1,8 +1,4 @@
 
-// stop the compiler from yelling for a minute
-// TODO: remove this
-
-
 use glium::{
     implement_vertex,
     Display,
