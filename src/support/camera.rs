@@ -1,19 +1,14 @@
+
+const UP: (f32, f32, f32) = (0.0, 1.0, 0.0);
+
 pub struct CameraState {
     aspect_ratio: f32,
     position: (f32, f32, f32),
+    rotation: (f32, f32, f32), 
     direction: (f32, f32, f32),
-
-    moving_up: bool,
-    moving_left: bool,
-    moving_down: bool,
-    moving_right: bool,
-    moving_forward: bool,
-    moving_backward: bool,
 
     moving: (i8, i8, i8),
     rotating: (i8, i8, i8),
-    rotation: (f32, f32, f32)
-
 }
 
 impl CameraState {
@@ -21,18 +16,11 @@ impl CameraState {
         CameraState {
             aspect_ratio: 1024.0 / 768.0,
             position: (0.1, 0.1, 1.0),
+            rotation: (0.5, 1.0, 0.0),
             direction: (0.0, 0.0, -1.0),
-            
-            moving_up: false,
-            moving_left: false,
-            moving_down: false,
-            moving_right: false,
-            moving_forward: false,
-            moving_backward: false,
 
             moving: (0, 0, 0),
             rotating: (0, 0, 0),
-            rotation: (0.5, 1.0, 0.0)
         }
     }
 
@@ -68,12 +56,10 @@ impl CameraState {
             (f.0 / len, f.1 / len, f.2 / len)
         };
 
-        let up = (0.0, 1.0, 0.0);
-
         let s = (
-            f.1 * up.2 - f.2 * up.1,
-            f.2 * up.0 - f.0 * up.2,
-            f.0 * up.1 - f.1 * up.0
+            f.1 * UP.2 - f.2 * UP.1,
+            f.2 * UP.0 - f.0 * UP.2,
+            f.0 * UP.1 - f.1 * UP.0
         );
 
         let s_norm = {
@@ -141,12 +127,10 @@ impl CameraState {
             (f.0 / len, f.1 / len, f.2 / len)
         };
 
-        let up = (0.0, 1.0, 0.0);
-
         let s = (
-            f.1 * up.2 - f.2 * up.1,
-            f.2 * up.0 - f.0 * up.2,
-            f.0 * up.1 - f.1 * up.0
+            f.1 * UP.2 - f.2 * UP.1,
+            f.2 * UP.0 - f.0 * UP.2,
+            f.0 * UP.1 - f.1 * UP.0
         );
 
         let s = {
