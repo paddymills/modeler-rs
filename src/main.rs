@@ -5,6 +5,6 @@ use phobia::{
 };
 
 fn main() {
-    State::<Application>::run_loop();
+    let _ = State::<Application>::run_loop();
 }
 
