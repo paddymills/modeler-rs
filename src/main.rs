@@ -1,7 +1,10 @@
 
-use phobia::support::State;
+use phobia::{
+    application::Application,
+    support::State,
+};
 
 fn main() {
-    State::<phobia::cube::Application>::run_loop();
+    State::<Application>::run_loop();
 }
 

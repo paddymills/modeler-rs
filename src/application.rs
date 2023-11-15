@@ -2,7 +2,10 @@
 use glium::uniform;
 use glium::{Display, Surface};
 use glium::glutin::surface::WindowSurface;
-use crate::support::{self, ApplicationContext};
+use crate::{
+    shaders,
+    support::{self, ApplicationContext}
+};
 
 pub struct Application {
     pub vertex_buffer: glium::vertex::VertexBufferAny,
@@ -14,12 +17,11 @@ impl ApplicationContext for Application {
     const WINDOW_TITLE:&'static str = "3d Modeler";
 
     fn new(display: &Display<WindowSurface>) -> Self {
-        let vertex_buffer = support::load_wavefront(&display, include_bytes!("obj/cube.obj"));
+        let vertex_buffer = support::load_wavefront(&display, crate::models::CUBE);
 
-        let vertex_shader_src   = include_str!("shaders/vertex.glsl");
-        let fragment_shader_src = include_str!("shaders/fragment.glsl");
-        let program = glium::Program::from_source(display, vertex_shader_src, fragment_shader_src,
-            None).unwrap();
+        let program = glium::Program::from_source(
+            display, shaders::VERTEX_SRC, shaders::FRAGMENT_SRC, None
+        ).unwrap();
 
         let camera = support::camera::CameraState::new();
 
