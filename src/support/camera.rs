@@ -177,28 +177,28 @@ impl CameraState {
 
     pub fn process_input(&mut self, event: &winit::event::WindowEvent) {
         use winit::{
-            event::WindowEvent,
+            event::{WindowEvent, ElementState},
             keyboard::{PhysicalKey, KeyCode}
         };
         
         match event {
             WindowEvent::KeyboardInput { event, .. } => {
-                let pressed = event.state == winit::event::ElementState::Pressed;
+                let pressed = (event.state == ElementState::Pressed) as i8;
                 match &event.physical_key {
                     // movement
-                    PhysicalKey::Code(KeyCode::ArrowUp)    => self.moving.2 =  (pressed as i8),
-                    PhysicalKey::Code(KeyCode::ArrowDown)  => self.moving.2 = -(pressed as i8),
-                    PhysicalKey::Code(KeyCode::KeyA)       => self.moving.0 = -(pressed as i8),
-                    PhysicalKey::Code(KeyCode::KeyD)       => self.moving.0 =  (pressed as i8),
-                    PhysicalKey::Code(KeyCode::KeyW)       => self.moving.1 =  (pressed as i8),
-                    PhysicalKey::Code(KeyCode::KeyS)       => self.moving.1 = -(pressed as i8),
+                    PhysicalKey::Code(KeyCode::ArrowUp)    => self.moving.2 =  pressed,
+                    PhysicalKey::Code(KeyCode::ArrowDown)  => self.moving.2 = -pressed,
+                    PhysicalKey::Code(KeyCode::KeyA)       => self.moving.0 = -pressed,
+                    PhysicalKey::Code(KeyCode::KeyD)       => self.moving.0 =  pressed,
+                    PhysicalKey::Code(KeyCode::KeyW)       => self.moving.1 =  pressed,
+                    PhysicalKey::Code(KeyCode::KeyS)       => self.moving.1 = -pressed,
 
                     // rotation
-                    PhysicalKey::Code(KeyCode::ArrowLeft)  => self.rotating.1 = -(pressed as i8),
-                    PhysicalKey::Code(KeyCode::ArrowRight) => self.rotating.1 =  (pressed as i8),
-                    PhysicalKey::Code(KeyCode::Digit1)  => self.rotating.0 = (pressed as i8),
-                    PhysicalKey::Code(KeyCode::Digit2)  => self.rotating.1 = (pressed as i8),
-                    PhysicalKey::Code(KeyCode::Digit3)  => self.rotating.2 = (pressed as i8),
+                    PhysicalKey::Code(KeyCode::ArrowLeft)  => self.rotating.1 = -pressed,
+                    PhysicalKey::Code(KeyCode::ArrowRight) => self.rotating.1 =  pressed,
+                    PhysicalKey::Code(KeyCode::Digit1)     => self.rotating.0 =  pressed,
+                    PhysicalKey::Code(KeyCode::Digit2)     => self.rotating.1 =  pressed,
+                    PhysicalKey::Code(KeyCode::Digit3)     => self.rotating.2 =  pressed,
 
                     // reset rotation
                     PhysicalKey::Code(KeyCode::KeyR) => self.rotation = (0.5, 1.0, 0.0),
