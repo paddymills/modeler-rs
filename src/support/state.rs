@@ -1,18 +1,15 @@
 
-
-
 use glium::{
     Display,
     glutin::surface::WindowSurface,
     backend::glutin::SimpleWindowBuilder,
 };
 
-
 use winit::{
     event::{ElementState, Event, KeyEvent, WindowEvent},
     event_loop::{EventLoop, EventLoopBuilder},
     keyboard::{Key, NamedKey},
-    window::Window,
+    window::Window, dpi::PhysicalSize,
 };
 
 pub trait ApplicationContext {
@@ -24,8 +21,8 @@ pub trait ApplicationContext {
 }
 
 pub struct State<T> {
-    pub display: glium::Display<WindowSurface>,
-    pub window: winit::window::Window,
+    pub display: Display<WindowSurface>,
+    pub window: Window,
     pub context: T,
 }
 
@@ -60,7 +57,14 @@ impl<T: ApplicationContext + 'static> State<T> {
                     if let Some(state) = &state {
                         state.window.request_redraw();
                     }
-                }
+                },
+                Event::Resumed => {
+                    // set the window size (will call WindowEvent::Resized in the camera)
+                    // this is a hack to correctly set the inital aspect ratio for the camera
+                    if let Some(state) = &mut state {
+                        let _ = state.window.request_inner_size(PhysicalSize { width: 800, height: 600 });
+                    }
+                },
                 Event::WindowEvent { event, .. } => match event {
                     WindowEvent::Resized(new_size) => {
                         if let Some(state) = &state {
