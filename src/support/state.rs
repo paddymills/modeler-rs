@@ -54,20 +54,18 @@ impl<T: ApplicationContext + 'static> State<T> {
 
             match event {
                 Event::Suspended => state.active = false,
+                
                 // By requesting a redraw in response to a AboutToWait event we get continuous rendering.
                 // For applications that only change due to user input you could remove this handler.
-                Event::AboutToWait => {
-                    state.window.request_redraw();
-                },
+                Event::AboutToWait => state.window.request_redraw(),
+
+                // set the window size (will call WindowEvent::Resized in the camera)
+                // this is a hack to correctly set the inital aspect ratio for the camera
                 Event::Resumed => {
-                    // set the window size (will call WindowEvent::Resized in the camera)
-                    // this is a hack to correctly set the inital aspect ratio for the camera
                     let _ = state.window.request_inner_size(PhysicalSize { width: 800, height: 600 });
                 },
                 Event::WindowEvent { event, .. } => match event {
-                    WindowEvent::Resized(new_size) => {
-                        state.display.resize(new_size.into());
-                    },
+                    WindowEvent::Resized(new_size) => state.display.resize(new_size.into()),
                     WindowEvent::RedrawRequested => {
                         state.context.update();
                         state.context.draw_frame(&state.display);
@@ -79,13 +77,10 @@ impl<T: ApplicationContext + 'static> State<T> {
                         state: ElementState::Pressed,
                         logical_key: Key::Named(NamedKey::Escape),
                         ..
-                    }, ..} => {
-                        window_target.exit()
-                    },
-                    // Every other event
-                    ev => {
-                        state.context.handle_window_event(&ev, &state.window);
-                    },
+                    }, ..} => window_target.exit(),
+
+                    // dispatch unmatched events to handler
+                    event => state.context.handle_window_event(&event, &state.window)
                 },
                 _ => (),
             };
