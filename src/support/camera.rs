@@ -10,6 +10,7 @@ pub struct CameraState {
     moving_forward: bool,
     moving_backward: bool,
 
+    moving: (i8, i8, i8),
     rotating: (i8, i8, i8),
     rotation: (f32, f32, f32)
 
@@ -29,6 +30,7 @@ impl CameraState {
             moving_forward: false,
             moving_backward: false,
 
+            moving: (0, 0, 0),
             rotating: (0, 0, 0),
             rotation: (0.5, 1.0, 0.0)
         }
@@ -159,40 +161,29 @@ impl CameraState {
             s.0 * f.1 - s.1 * f.0
         );
 
-        if self.moving_up {
-            self.position.0 += u.0 * 0.01;
-            self.position.1 += u.1 * 0.01;
-            self.position.2 += u.2 * 0.01;
+        // remember
+        //  s depends on f
+        //  u depends on s, and therefore f
+
+        // x-axis: left/right
+        if self.moving.0 != 0 {
+            self.position.0 += s.0 * 0.01 * (self.moving.0 as f32);
+            self.position.1 += s.1 * 0.01 * (self.moving.0 as f32);
+            self.position.2 += s.2 * 0.01 * (self.moving.0 as f32);
         }
 
-        if self.moving_left {
-            self.position.0 -= s.0 * 0.01;
-            self.position.1 -= s.1 * 0.01;
-            self.position.2 -= s.2 * 0.01;
+        // y-axis: front/back
+        if self.moving.1 != 0 {
+            self.position.0 += f.0 * 0.01 * (self.moving.1 as f32);
+            self.position.1 += f.1 * 0.01 * (self.moving.1 as f32);
+            self.position.2 += f.2 * 0.01 * (self.moving.1 as f32);
         }
 
-        if self.moving_down {
-            self.position.0 -= u.0 * 0.01;
-            self.position.1 -= u.1 * 0.01;
-            self.position.2 -= u.2 * 0.01;
-        }
-
-        if self.moving_right {
-            self.position.0 += s.0 * 0.01;
-            self.position.1 += s.1 * 0.01;
-            self.position.2 += s.2 * 0.01;
-        }
-
-        if self.moving_forward {
-            self.position.0 += f.0 * 0.01;
-            self.position.1 += f.1 * 0.01;
-            self.position.2 += f.2 * 0.01;
-        }
-
-        if self.moving_backward {
-            self.position.0 -= f.0 * 0.01;
-            self.position.1 -= f.1 * 0.01;
-            self.position.2 -= f.2 * 0.01;
+        // z-axis: up/down
+        if self.moving.2 != 0 {
+            self.position.0 += u.0 * 0.01 * (self.moving.2 as f32);
+            self.position.1 += u.1 * 0.01 * (self.moving.2 as f32);
+            self.position.2 += u.2 * 0.01 * (self.moving.2 as f32);
         }
 
         self.rotation.0 += (self.rotating.0 as f32) * 0.01;
@@ -201,32 +192,41 @@ impl CameraState {
     }
 
     pub fn process_input(&mut self, event: &winit::event::WindowEvent) {
-        use winit::keyboard::{PhysicalKey, KeyCode};
-        let winit::event::WindowEvent::KeyboardInput { event, .. } = event else {
-            return
+        use winit::{
+            event::WindowEvent,
+            keyboard::{PhysicalKey, KeyCode}
         };
+        
+        match event {
+            WindowEvent::KeyboardInput { event, .. } => {
+                let pressed = event.state == winit::event::ElementState::Pressed;
+                match &event.physical_key {
+                    // movement
+                    PhysicalKey::Code(KeyCode::ArrowUp)    => self.moving.2 =  (pressed as i8),
+                    PhysicalKey::Code(KeyCode::ArrowDown)  => self.moving.2 = -(pressed as i8),
+                    PhysicalKey::Code(KeyCode::KeyA)       => self.moving.0 = -(pressed as i8),
+                    PhysicalKey::Code(KeyCode::KeyD)       => self.moving.0 =  (pressed as i8),
+                    PhysicalKey::Code(KeyCode::KeyW)       => self.moving.1 =  (pressed as i8),
+                    PhysicalKey::Code(KeyCode::KeyS)       => self.moving.1 = -(pressed as i8),
 
-        let pressed = event.state == winit::event::ElementState::Pressed;
-        match &event.physical_key {
-            // movement
-            PhysicalKey::Code(KeyCode::ArrowUp)    => self.moving_up = pressed,
-            PhysicalKey::Code(KeyCode::ArrowDown)  => self.moving_down = pressed,
-            PhysicalKey::Code(KeyCode::KeyA)       => self.moving_left = pressed,
-            PhysicalKey::Code(KeyCode::KeyD)       => self.moving_right = pressed,
-            PhysicalKey::Code(KeyCode::KeyW)       => self.moving_forward = pressed,
-            PhysicalKey::Code(KeyCode::KeyS)       => self.moving_backward = pressed,
+                    // rotation
+                    PhysicalKey::Code(KeyCode::ArrowLeft)  => self.rotating.1 = -(pressed as i8),
+                    PhysicalKey::Code(KeyCode::ArrowRight) => self.rotating.1 =  (pressed as i8),
+                    PhysicalKey::Code(KeyCode::Digit1)  => self.rotating.0 = (pressed as i8),
+                    PhysicalKey::Code(KeyCode::Digit2)  => self.rotating.1 = (pressed as i8),
+                    PhysicalKey::Code(KeyCode::Digit3)  => self.rotating.2 = (pressed as i8),
 
-            // rotation
-            PhysicalKey::Code(KeyCode::ArrowLeft)  => self.rotating.1 = -(pressed as i8),
-            PhysicalKey::Code(KeyCode::ArrowRight) => self.rotating.1 =  (pressed as i8),
-            PhysicalKey::Code(KeyCode::Digit1)  => self.rotating.0 = (pressed as i8),
-            PhysicalKey::Code(KeyCode::Digit2)  => self.rotating.1 = (pressed as i8),
-            PhysicalKey::Code(KeyCode::Digit3)  => self.rotating.2 = (pressed as i8),
+                    // reset rotation
+                    PhysicalKey::Code(KeyCode::KeyR) => self.rotation = (0.5, 1.0, 0.0),
 
-            // reset rotation
-            PhysicalKey::Code(KeyCode::KeyR) => self.rotation = (0.5, 1.0, 0.0),
-
-            _ => (),
-        };
+                    _ => (),
+                }
+            },
+            WindowEvent::CursorMoved { position, .. } => todo!(),
+            WindowEvent::MouseInput { button, state, .. } => todo!(),
+            WindowEvent::MouseWheel { delta, phase, .. } => todo!(),
+            WindowEvent::Resized(size) => self.aspect_ratio = size.width as f32 / size.height as f32,
+            _ => ()
+        }
     }
 }
