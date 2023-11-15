@@ -21,6 +21,8 @@ Requires a rust toolchain to be installed. Get one [here](https://rustup.rs/).
     - [ ] Save format
     - [ ] Export to .stl
 
+# Midway Feedback
+- [ ] movement acceleration
 
 # Resources
 - [Learn OpenGL](https://learnopengl.com/)
