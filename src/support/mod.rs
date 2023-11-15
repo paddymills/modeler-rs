@@ -1,17 +1,14 @@
 
 // stop the compiler from yelling for a minute
 // TODO: remove this
-#![allow(unused, deprecated)]
 
-use std::num::NonZeroU32;
 
-use glium::implement_vertex;
-use glium::{self, Display};
-use glium::glutin::surface::WindowSurface;
-
-use glutin::context::NotCurrentGlContext;
-use glutin::display::{GlDisplay, GetGlDisplay};
-use winit::raw_window_handle::HasRawWindowHandle;
+use glium::{
+    implement_vertex,
+    Display,
+    glutin::surface::WindowSurface,
+    vertex::VertexBuffer,
+};
 
 pub mod camera;
 
@@ -57,5 +54,5 @@ pub fn load_wavefront(display: &Display<WindowSurface>, data: &[u8]) -> glium::v
         }
     }
 
-    glium::vertex::VertexBuffer::new(display, &vertex_data).unwrap().into()
+    VertexBuffer::new(display, &vertex_data).unwrap().into()
 }

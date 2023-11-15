@@ -1,23 +1,17 @@
 
-use std::num::NonZeroU32;
+
 
 use glium::{
-    implement_vertex,
     Display,
     glutin::surface::WindowSurface,
     backend::glutin::SimpleWindowBuilder,
 };
 
-use glutin::{
-    context::NotCurrentGlContext,
-    display::{GlDisplay, GetGlDisplay},
-};
 
 use winit::{
     event::{ElementState, Event, KeyEvent, WindowEvent},
     event_loop::{EventLoop, EventLoopBuilder},
     keyboard::{Key, NamedKey},
-    raw_window_handle::HasRawWindowHandle,
     window::Window,
 };
 
