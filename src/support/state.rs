@@ -15,8 +15,10 @@ pub trait ApplicationContext {
     const WINDOW_TITLE:&'static str;
     fn draw_frame(&mut self, _display: &Display<WindowSurface>) { }
     fn new(display: &Display<WindowSurface>) -> Self;
+    fn init(&mut self);
     fn update(&mut self) { }
     fn handle_window_event(&mut self, _event: &WindowEvent, _window: &winit::window::Window) { }
+    fn update_model(&mut self, display: &Display<WindowSurface>);
 }
 
 pub struct State<T> {
@@ -47,9 +49,12 @@ impl<T: ApplicationContext + 'static> State<T> {
             .build()
             .expect("event loop building");
         let mut state: State<T> = State::new(&event_loop);
+        state.context.init();
 
         event_loop.run(move |event, window_target| {
             if !state.active { () }
+
+            state.context.update_model(&state.display);
 
             match event {
                 Event::Suspended => state.active = false,

@@ -16,3 +16,4 @@ glium = { version = "0.33", git = "https://github.com/glium/glium" }
 winit = "0.29"
 
 obj = { version = "0.10", features = ["genmesh"] }
+native-dialog = "0.7.0"

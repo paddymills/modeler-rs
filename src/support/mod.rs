@@ -12,7 +12,7 @@ mod state;
 pub use state::{ApplicationContext, State};
 
 /// Returns a vertex buffer that should be rendered as `TrianglesList`.
-pub fn load_wavefront(display: &Display<WindowSurface>, data: &[u8]) -> glium::vertex::VertexBufferAny {
+pub fn load_wavefront(display: &Display<WindowSurface>, data: &obj::Obj) -> glium::vertex::VertexBufferAny {
     #[derive(Copy, Clone)]
     struct Vertex {
         position: [f32; 3],
@@ -21,12 +21,10 @@ pub fn load_wavefront(display: &Display<WindowSurface>, data: &[u8]) -> glium::v
     }
 
     implement_vertex!(Vertex, position, normal, texture);
-
-    let mut data = ::std::io::BufReader::new(data);
-    let data = obj::ObjData::load_buf(&mut data).unwrap();
-
+    
     let mut vertex_data = Vec::new();
-
+    
+    let data = &data.data;
     for object in data.objects.iter() {
         for polygon in object.groups.iter().flat_map(|g| g.polys.iter()) {
             match polygon {
