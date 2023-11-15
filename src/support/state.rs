@@ -6,9 +6,8 @@ use glium::{
 };
 
 use winit::{
-    event::{ElementState, Event, KeyEvent, WindowEvent},
+    event::{Event, WindowEvent},
     event_loop::{EventLoop, EventLoopBuilder},
-    keyboard::{Key, NamedKey},
     window::Window, dpi::PhysicalSize,
 };
 
@@ -70,14 +69,9 @@ impl<T: ApplicationContext + 'static> State<T> {
                         state.context.update();
                         state.context.draw_frame(&state.display);
                     },
-                    // Exit the event loop when requested (by closing the window for example) or when
-                    // pressing the Esc key.
-                    WindowEvent::CloseRequested
-                    | WindowEvent::KeyboardInput { event: KeyEvent {
-                        state: ElementState::Pressed,
-                        logical_key: Key::Named(NamedKey::Escape),
-                        ..
-                    }, ..} => window_target.exit(),
+
+                    // Exit the event loop when requested
+                    WindowEvent::CloseRequested => window_target.exit(),
 
                     // dispatch unmatched events to handler
                     event => state.context.handle_window_event(&event, &state.window)
