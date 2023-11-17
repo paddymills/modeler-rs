@@ -31,7 +31,7 @@ pub struct State<T> {
 impl<T: ApplicationContext + 'static> State<T> {
     pub fn new(event_loop: &EventLoop<()>) -> Self {
         let (window, display) = SimpleWindowBuilder::new()
-            .with_title(crate::config::TITLE)
+            .with_title(T::WINDOW_TITLE)
             .build(event_loop);
 
         Self::from_display_window(display, window)
@@ -60,12 +60,13 @@ impl<T: ApplicationContext + 'static> State<T> {
                 Event::Suspended => state.active = false,
                 
                 // By requesting a redraw in response to a AboutToWait event we get continuous rendering.
-                // For applications that only change due to user input you could remove this handler.
+                // This is needed, otherwise camera movements can be laggy.
                 Event::AboutToWait => state.window.request_redraw(),
 
                 // set the window size (will call WindowEvent::Resized in the camera)
                 // this is a hack to correctly set the inital aspect ratio for the camera
                 Event::Resumed => {
+                    // TODO: cache window size so that last used window size persists
                     let _ = state.window.request_inner_size(PhysicalSize { width: 800, height: 600 });
                 },
                 Event::WindowEvent { event, .. } => match event {
