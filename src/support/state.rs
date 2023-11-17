@@ -21,6 +21,7 @@ pub trait ApplicationContext {
     fn update_model(&mut self, display: &Display<WindowSurface>);
 }
 
+#[derive(Debug)]
 pub struct State<T> {
     pub display: Display<WindowSurface>,
     pub window: Window,

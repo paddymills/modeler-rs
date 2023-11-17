@@ -2,6 +2,7 @@
 pub const UPDATE_DISTANCE: f32 = 0.01;
 const UP: (f32, f32, f32) = (0.0, 1.0, 0.0);
 
+#[derive(Debug)]
 pub struct CameraState {
     aspect_ratio: f32,
     position: (f32, f32, f32),

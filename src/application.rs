@@ -12,8 +12,8 @@ use crate::{
     shaders,
     support::{self, ApplicationContext}
 };
-use obj::Obj;
 
+#[derive(Debug)]
 pub struct Application {
     pub vertex_buffer: Option<VertexBufferAny>,
     pub program: glium::Program,
