@@ -1,7 +1,6 @@
 
 
 pub mod application;
-pub mod models;
 pub mod shaders;
 pub mod support;
 
