@@ -37,7 +37,7 @@ impl Application {
 }
 
 impl ApplicationContext for Application {
-    const WINDOW_TITLE:&'static str = "3d Modeler";
+    const WINDOW_TITLE:&'static str = crate::config::TITLE;
 
     fn new(display: &Display<WindowSurface>) -> Self {
         let program = glium::Program::from_source(
