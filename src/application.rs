@@ -4,22 +4,20 @@ use support::camera::CameraState;
 use glium::{
     uniform,
     {Display, Surface},
-    vertex::VertexBufferAny,
     glutin::surface::WindowSurface,
 };
-use crate::support::camera;
 use crate::{
+    model::Model,
     shaders,
-    support::{self, ApplicationContext}
+    support::{self, camera, ApplicationContext}
 };
 
 #[derive(Debug)]
 pub struct Application {
-    pub vertex_buffer: Option<VertexBufferAny>,
     pub program: glium::Program,
     pub camera: CameraState,
 
-    model: Option<(Obj, bool)>
+    model: Model
 }
 
 impl Application {
@@ -31,7 +29,7 @@ impl Application {
             .unwrap_or_default();
         
         if let Some(path) = path {
-            self.model = Some((Obj::load(path).unwrap(), true))
+            self.model.load(path);
         };
     }
 }
@@ -45,10 +43,9 @@ impl ApplicationContext for Application {
         ).unwrap();
 
         Self {
-            vertex_buffer: None,
             program,
             camera: CameraState::new(),
-            model: None
+            model: Model::new()
         }
     }
 
@@ -57,8 +54,6 @@ impl ApplicationContext for Application {
     }
 
     fn draw_frame(&mut self, display: &Display<WindowSurface>) {
-        if let None = self.vertex_buffer { () }
-
         let mut frame = display.draw();
         // building the uniforms
         let uniforms = uniform! {
@@ -82,7 +77,7 @@ impl ApplicationContext for Application {
         frame.clear_color_and_depth((0.18, 0.25, 0.4, 1.0), 1.0);
         frame
             .draw(
-                self.vertex_buffer.as_ref().unwrap(),
+                self.model.vertex_buffer(display),
                 &glium::index::NoIndices(glium::index::PrimitiveType::TrianglesList),
                 &self.program,
                 &uniforms,
@@ -98,11 +93,5 @@ impl ApplicationContext for Application {
 
     fn update(&mut self) {
         self.camera.update(camera::UPDATE_DISTANCE);
-    }
-
-    fn update_model(&mut self, display: &Display<WindowSurface>) {
-        if let Some((model, true)) = &self.model {
-            self.vertex_buffer = Some(support::load_wavefront(display, &model));
-        }
     }
 }
