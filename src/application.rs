@@ -1,4 +1,5 @@
 
+use egui_glium::EguiGlium;
 use support::camera::CameraState;
 
 use glium::{
@@ -53,7 +54,7 @@ impl ApplicationContext for Application {
         self.open();
     }
 
-    fn draw_frame(&mut self, display: &Display<WindowSurface>) {
+    fn draw_frame(&mut self, display: &Display<WindowSurface>, egui_glium_ctx: &mut EguiGlium) {
         let mut frame = display.draw();
         // building the uniforms
         let uniforms = uniform! {
@@ -84,6 +85,10 @@ impl ApplicationContext for Application {
                 &params,
             )
             .unwrap();
+
+        // draw egui header
+        egui_glium_ctx.paint(display, &mut frame);
+
         frame.finish().unwrap();
     }
 

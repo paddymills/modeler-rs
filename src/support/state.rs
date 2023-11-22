@@ -13,11 +13,11 @@ use winit::{
 
 pub trait ApplicationContext {
     const WINDOW_TITLE:&'static str;
-    fn draw_frame(&mut self, _display: &Display<WindowSurface>) { }
+    fn draw_frame(&mut self, display: &Display<WindowSurface>, ctx: &mut egui_glium::EguiGlium);
     fn new(display: &Display<WindowSurface>) -> Self;
     fn init(&mut self);
     fn update(&mut self) { }
-    fn handle_window_event(&mut self, _event: &WindowEvent, _window: &winit::window::Window) { }
+    fn handle_window_event(&mut self, event: &WindowEvent, window: &winit::window::Window);
 }
 
 #[derive(Debug)]
@@ -51,8 +51,24 @@ impl<T: ApplicationContext + 'static> State<T> {
         let mut state: State<T> = State::new(&event_loop);
         state.context.init();
 
+        let mut egui_glium_ctx = egui_glium::EguiGlium::new(&state.display, &state.window, &event_loop);
+
         event_loop.run(move |event, window_target| {
             if !state.active { () }
+
+            let mut redraw = || {
+                let repaint_after = egui_glium_ctx.run(&state.window, |ctx| {
+                    egui::TopBottomPanel::top("menu").show(ctx, |ui| {
+                        if ui.button("Menu").clicked() {
+                            println!("menu selected");
+                        }
+                    });
+                });
+
+                if repaint_after.is_zero() {
+                    let _ = &state.window.request_redraw();
+                }
+            };
 
             match event {
                 Event::Suspended => state.active = false,
@@ -70,15 +86,22 @@ impl<T: ApplicationContext + 'static> State<T> {
                 Event::WindowEvent { event, .. } => match event {
                     WindowEvent::Resized(new_size) => state.display.resize(new_size.into()),
                     WindowEvent::RedrawRequested => {
+                        redraw();
+
                         state.context.update();
-                        state.context.draw_frame(&state.display);
+                        state.context.draw_frame(&state.display, &mut egui_glium_ctx);
                     },
 
                     // Exit the event loop when requested
                     WindowEvent::CloseRequested => window_target.exit(),
 
                     // dispatch unmatched events to handler
-                    event => state.context.handle_window_event(&event, &state.window)
+                    event => {
+                        if egui_glium_ctx.on_event(&event).repaint {
+                            let _ = &state.window.request_redraw();
+                        }
+                        state.context.handle_window_event(&event, &state.window)
+                    }
                 },
                 _ => (),
             };
