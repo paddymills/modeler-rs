@@ -182,32 +182,29 @@ impl CameraState {
     }
 
     pub fn process_input(&mut self, event: &winit::event::WindowEvent) {
-        use winit::{
-            event::{WindowEvent, ElementState, MouseScrollDelta},
-            keyboard::{PhysicalKey, KeyCode}
-        };
+        use winit::event::{WindowEvent, ElementState, MouseScrollDelta, KeyboardInput, VirtualKeyCode};
         
         match event {
-            WindowEvent::KeyboardInput { event, .. } => {
-                let pressed = (event.state == ElementState::Pressed) as i8;
-                match &event.physical_key {
+            WindowEvent::KeyboardInput { input: KeyboardInput { state, virtual_keycode: Some(keycode), .. }, .. } => {
+                let pressed = (state == &ElementState::Pressed) as i8;
+                match &keycode {
                     // movement
-                    PhysicalKey::Code(KeyCode::ArrowUp)    => self.moving.2 =  pressed,
-                    PhysicalKey::Code(KeyCode::ArrowDown)  => self.moving.2 = -pressed,
-                    PhysicalKey::Code(KeyCode::KeyA)       => self.moving.0 = -pressed,
-                    PhysicalKey::Code(KeyCode::KeyD)       => self.moving.0 =  pressed,
-                    PhysicalKey::Code(KeyCode::KeyW)       => self.moving.1 =  pressed,
-                    PhysicalKey::Code(KeyCode::KeyS)       => self.moving.1 = -pressed,
+                    VirtualKeyCode::Up   => self.moving.2 =  pressed,
+                    VirtualKeyCode::Down => self.moving.2 = -pressed,
+                    VirtualKeyCode::A      => self.moving.0 = -pressed,
+                    VirtualKeyCode::D      => self.moving.0 =  pressed,
+                    VirtualKeyCode::W      => self.moving.1 =  pressed,
+                    VirtualKeyCode::S      => self.moving.1 = -pressed,
 
                     // rotation
-                    PhysicalKey::Code(KeyCode::ArrowLeft)  => self.rotating.1 = -pressed,
-                    PhysicalKey::Code(KeyCode::ArrowRight) => self.rotating.1 =  pressed,
-                    PhysicalKey::Code(KeyCode::Digit1)     => self.rotating.0 =  pressed,
-                    PhysicalKey::Code(KeyCode::Digit2)     => self.rotating.1 =  pressed,
-                    PhysicalKey::Code(KeyCode::Digit3)     => self.rotating.2 =  pressed,
+                    VirtualKeyCode::Left  => self.rotating.1 = -pressed,
+                    VirtualKeyCode::Right => self.rotating.1 =  pressed,
+                    VirtualKeyCode::Key1  => self.rotating.0 =  pressed,
+                    VirtualKeyCode::Key2  => self.rotating.1 =  pressed,
+                    VirtualKeyCode::Key3  => self.rotating.2 =  pressed,
 
                     // reset rotation
-                    PhysicalKey::Code(KeyCode::KeyR) => self.rotation = (0.5, 1.0, 0.0),
+                    VirtualKeyCode::R => self.rotation = (0.5, 1.0, 0.0),
 
                     _ => (),
                 }

@@ -568,7 +568,7 @@ dependencies = [
  "bytemuck",
  "egui",
  "egui-winit",
- "glium 0.33.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "glium",
  "winit 0.28.7",
 ]
 
@@ -776,24 +776,6 @@ dependencies = [
  "smallvec",
  "takeable-option",
  "winit 0.28.7",
-]
-
-[[package]]
-name = "glium"
-version = "0.33.0"
-source = "git+https://github.com/glium/glium#968fc92378caf4b8306785dd005b51cd1a7cf97f"
-dependencies = [
- "backtrace",
- "fnv",
- "gl_generator",
- "glutin 0.31.1",
- "glutin-winit 0.4.2",
- "lazy_static",
- "memoffset 0.9.0",
- "raw-window-handle 0.5.2",
- "smallvec",
- "takeable-option",
- "winit 0.29.3",
 ]
 
 [[package]]
@@ -1573,12 +1555,12 @@ version = "0.1.0"
 dependencies = [
  "egui",
  "egui_glium",
- "glium 0.33.0 (git+https://github.com/glium/glium)",
+ "glium",
  "glutin 0.31.1",
  "glutin-winit 0.4.2",
  "native-dialog",
  "obj",
- "winit 0.29.3",
+ "winit 0.28.7",
 ]
 
 [[package]]
@@ -1785,20 +1767,7 @@ dependencies = [
  "log",
  "memmap2 0.5.10",
  "smithay-client-toolkit 0.16.1",
- "tiny-skia 0.8.4",
-]
-
-[[package]]
-name = "sctk-adwaita"
-version = "0.7.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1729a30a469de249c6effc17ec8d039b0aa29b3af79b819b7f51cb6ab8046a90"
-dependencies = [
- "ab_glyph",
- "log",
- "memmap2 0.9.0",
- "smithay-client-toolkit 0.18.0",
- "tiny-skia 0.11.2",
+ "tiny-skia",
 ]
 
 [[package]]
@@ -1985,21 +1954,7 @@ dependencies = [
  "bytemuck",
  "cfg-if",
  "png",
- "tiny-skia-path 0.8.4",
-]
-
-[[package]]
-name = "tiny-skia"
-version = "0.11.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3b72a92a05db376db09fe6d50b7948d106011761c05a6a45e23e17ee9b556222"
-dependencies = [
- "arrayref",
- "arrayvec",
- "bytemuck",
- "cfg-if",
- "log",
- "tiny-skia-path 0.11.2",
+ "tiny-skia-path",
 ]
 
 [[package]]
@@ -2007,17 +1962,6 @@ name = "tiny-skia-path"
 version = "0.8.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "adbfb5d3f3dd57a0e11d12f4f13d4ebbbc1b5c15b7ab0a156d030b21da5f677c"
-dependencies = [
- "arrayref",
- "bytemuck",
- "strict-num",
-]
-
-[[package]]
-name = "tiny-skia-path"
-version = "0.11.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6ac3865b9708fc7e1961a65c3a4fa55e984272f33092d3c859929f887fceb647"
 dependencies = [
  "arrayref",
  "bytemuck",
@@ -2668,7 +2612,7 @@ dependencies = [
  "percent-encoding",
  "raw-window-handle 0.5.2",
  "redox_syscall 0.3.5",
- "sctk-adwaita 0.5.4",
+ "sctk-adwaita",
  "smithay-client-toolkit 0.16.1",
  "wasm-bindgen",
  "wayland-client 0.29.5",
@@ -2708,10 +2652,8 @@ dependencies = [
  "orbclient",
  "percent-encoding",
  "raw-window-handle 0.5.2",
- "raw-window-handle 0.6.0",
  "redox_syscall 0.3.5",
  "rustix",
- "sctk-adwaita 0.7.0",
  "smithay-client-toolkit 0.18.0",
  "smol_str",
  "unicode-segmentation",

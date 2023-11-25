@@ -44,16 +44,14 @@ impl<T: ApplicationContext + 'static> State<T> {
     }
 
     /// Start the event_loop and keep rendering frames until the program is closed
-    pub fn run_loop() -> Result<(), winit::error::EventLoopError> {
-        let event_loop = EventLoopBuilder::new()
-            .build()
-            .expect("event loop building");
+    pub fn run_loop() -> Result<(), String> {
+        let event_loop = EventLoopBuilder::new().build();
         let mut state: State<T> = State::new(&event_loop);
         state.context.init();
 
         let mut egui_glium_ctx = egui_glium::EguiGlium::new(&state.display, &state.window, &event_loop);
 
-        event_loop.run(move |event, window_target| {
+        event_loop.run(move |event, window_target, control_flow| {
             if !state.active { () }
 
             let mut redraw = || {
@@ -73,27 +71,27 @@ impl<T: ApplicationContext + 'static> State<T> {
             match event {
                 Event::Suspended => state.active = false,
                 
-                // By requesting a redraw in response to a AboutToWait event we get continuous rendering.
+                // By requesting a redraw in response to a RedrawEventsCleared event we get continuous rendering.
                 // This is needed, otherwise camera movements can be laggy.
-                Event::AboutToWait => state.window.request_redraw(),
+                Event::RedrawEventsCleared => state.window.request_redraw(),
 
                 // set the window size (will call WindowEvent::Resized in the camera)
                 // this is a hack to correctly set the inital aspect ratio for the camera
                 Event::Resumed => {
                     // TODO: cache window size so that last used window size persists
-                    let _ = state.window.request_inner_size(PhysicalSize { width: 800, height: 600 });
+                    let _ = state.window.set_inner_size(PhysicalSize { width: 800, height: 600 });
                 },
+                Event::RedrawRequested(_) => {
+                    redraw();
+
+                    state.context.update();
+                    state.context.draw_frame(&state.display, &mut egui_glium_ctx);
+                }
                 Event::WindowEvent { event, .. } => match event {
                     WindowEvent::Resized(new_size) => state.display.resize(new_size.into()),
-                    WindowEvent::RedrawRequested => {
-                        redraw();
-
-                        state.context.update();
-                        state.context.draw_frame(&state.display, &mut egui_glium_ctx);
-                    },
 
                     // Exit the event loop when requested
-                    WindowEvent::CloseRequested => window_target.exit(),
+                    WindowEvent::CloseRequested => control_flow.set_exit(),
 
                     // dispatch unmatched events to handler
                     event => {
