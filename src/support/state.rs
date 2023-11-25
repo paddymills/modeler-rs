@@ -51,7 +51,7 @@ impl<T: ApplicationContext + 'static> State<T> {
 
         let mut egui_glium_ctx = egui_glium::EguiGlium::new(&state.display, &state.window, &event_loop);
 
-        event_loop.run(move |event, window_target, control_flow| {
+        event_loop.run(move |event, _window_target, control_flow| {
             if !state.active { () }
 
             let mut redraw = || {
