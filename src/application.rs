@@ -1,4 +1,5 @@
 
+use egui::Context;
 use egui_glium::EguiGlium;
 use support::camera::CameraState;
 
@@ -7,6 +8,7 @@ use glium::{
     {Display, Surface},
     glutin::surface::WindowSurface,
 };
+use winit::event_loop::ControlFlow;
 use crate::{
     model::Model,
     shaders,
@@ -51,7 +53,35 @@ impl ApplicationContext for Application {
     }
 
     fn init(&mut self) {
-        self.open();
+        ()
+    }
+
+    fn draw_menu(&mut self, ctx: &Context, control_flow: &mut ControlFlow) {
+        egui::TopBottomPanel::top("menu").show(ctx, |ui| {
+            ui.menu_button("Menu", |ui| {
+                if ui.button("Open").clicked() {
+                    todo!("impl open of native file");
+                }
+
+                ui.menu_button("Import", |ui| {
+                    if ui.button("Waveform (.obj)").clicked() {
+                        self.open();
+                        ui.close_menu();
+                        
+                        ctx.request_repaint();
+                    }
+                });
+                ui.menu_button("Export", |ui| {
+                    if ui.button("Stereolithography (.stl)").clicked() {
+                        todo!("impl stl export menu button");
+                    }
+                });
+
+                if ui.button("Quit").clicked() {
+                    control_flow.set_exit();
+                }
+            })
+        });
     }
 
     fn draw_frame(&mut self, display: &Display<WindowSurface>, egui_glium_ctx: &mut EguiGlium) {
