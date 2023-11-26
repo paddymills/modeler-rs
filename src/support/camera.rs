@@ -1,33 +1,51 @@
+use winit::{
+    dpi::PhysicalPosition,
+    event::{
+        WindowEvent, ElementState, KeyboardInput, VirtualKeyCode, MouseButton, MouseScrollDelta
+    }
+};
+
 
 pub const UPDATE_DISTANCE: f32 = 0.01;
 const UP: (f32, f32, f32) = (0.0, 1.0, 0.0);
 
 #[derive(Debug)]
 pub struct CameraState {
-    aspect_ratio: f32,
+    width: f32,
+    height: f32,
+
     position: (f32, f32, f32),
     rotation: (f32, f32, f32), 
     direction: (f32, f32, f32),
 
     moving: (i8, i8, i8),
     rotating: (i8, i8, i8),
+
+    lmouse_held: bool,
+    mouse_pos: PhysicalPosition<f32>,
 }
 
 impl CameraState {
     pub fn new() -> CameraState {
         CameraState {
-            aspect_ratio: 1024.0 / 768.0,
+            width: 1024.0,
+            height: 768.0,
+
             position: (0.1, 0.1, 1.0),
             rotation: (0.5, 1.0, 0.0),
             direction: (0.0, 0.0, -1.0),
 
             moving: (0, 0, 0),
             rotating: (0, 0, 0),
+
+            lmouse_held: false,
+            mouse_pos: PhysicalPosition::default()
         }
     }
 
     pub fn set_aspect_ratio(&mut self, x: f32, y: f32) {
-        self.aspect_ratio = x / y
+        self.width = x;
+        self.height = y;
     }
 
     pub fn set_position(&mut self, pos: (f32, f32, f32)) {
@@ -36,6 +54,10 @@ impl CameraState {
 
     pub fn set_direction(&mut self, dir: (f32, f32, f32)) {
         self.direction = dir;
+    }
+
+    pub fn get_aspect_ratio(&self) -> f32 {
+        self.width / self.height
     }
 
     pub fn get_perspective(&self) -> [[f32; 4]; 4] {
@@ -47,10 +69,10 @@ impl CameraState {
 
         // note: remember that this is column-major, so the lines of code are actually columns
         [
-            [f / self.aspect_ratio,    0.0,                 0.0           ,   0.0],
-            [         0.0         ,     f ,                 0.0           ,   0.0],
-            [         0.0         ,    0.0,  (    zfar+znear)/(zfar-znear),   1.0],
-            [         0.0         ,    0.0, -(2.0*zfar*znear)/(zfar-znear),   0.0],
+            [f / self.get_aspect_ratio(), 0.0,                 0.0           , 0.0],
+            [            0.0            ,  f ,                 0.0           , 0.0],
+            [            0.0            , 0.0,  (    zfar+znear)/(zfar-znear), 1.0],
+            [            0.0            , 0.0, -(2.0*zfar*znear)/(zfar-znear), 0.0],
         ]
     }
 
@@ -181,9 +203,7 @@ impl CameraState {
         self.rotation.2 += (self.rotating.2 as f32) * dist;
     }
 
-    pub fn process_input(&mut self, event: &winit::event::WindowEvent) {
-        use winit::event::{WindowEvent, ElementState, MouseScrollDelta, KeyboardInput, VirtualKeyCode};
-        
+    pub fn process_input(&mut self, event: &WindowEvent) {
         match event {
             WindowEvent::KeyboardInput { input: KeyboardInput { state, virtual_keycode: Some(keycode), .. }, .. } => {
                 let pressed = (state == &ElementState::Pressed) as i8;
@@ -209,8 +229,32 @@ impl CameraState {
                     _ => (),
                 }
             },
-            // WindowEvent::CursorMoved { position, .. } => todo!(),
-            // WindowEvent::MouseInput { button, state, .. } => todo!(),
+            WindowEvent::CursorMoved { position, .. } => {
+                if self.lmouse_held {
+                    let x = (position.x as f32 - self.mouse_pos.x) / self.width;
+                    let y = (position.y as f32 - self.mouse_pos.y) / self.height;
+
+                    // TODO: refactor to impl this better
+                    // TODO: rotation about axes, given current camera position
+                    // x-rotation about the z-axis
+                    self.rotating.2 = (x / x.abs()) as i8;
+                    self.update(x.abs());
+                    self.rotating.2 = 0;
+                    // y-rotation about the x-axis
+                    self.rotating.0 = (y / y.abs()) as i8;
+                    self.update(y.abs());
+                    self.rotating.0 = 0;
+                }
+                
+                self.mouse_pos.x = position.x as f32;
+                self.mouse_pos.y = position.y as f32;
+            },
+            WindowEvent::MouseInput { button, state, .. } => {
+                match button {
+                    MouseButton::Left => self.lmouse_held = state == &ElementState::Pressed,
+                    _ => ()
+                }
+            },
             WindowEvent::MouseWheel { delta, .. } => {
                 let (x, y) = match delta {
                     MouseScrollDelta::LineDelta(x, y) => (*x, *y),
