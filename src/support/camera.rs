@@ -14,8 +14,8 @@ pub struct CameraState {
     width: f32,
     height: f32,
 
-    position: (f32, f32, f32),
-    rotation: (f32, f32, f32), 
+    pub position: (f32, f32, f32),
+    pub rotation: (f32, f32, f32), 
     direction: (f32, f32, f32),
 
     moving: (i8, i8, i8),
@@ -41,6 +41,26 @@ impl CameraState {
             lmouse_held: false,
             mouse_pos: PhysicalPosition::default()
         }
+    }
+
+    fn normalize(&mut self) {
+        let (min, max) = (0.0, 2.0 * 3.14159);
+
+        let norm = |val| {
+                match val {
+                x if x < min => val + max,
+                x if x > max => val - max,
+                _ => val
+            }
+        };
+
+        self.rotation.0 = norm(self.rotation.0);
+        self.rotation.1 = norm(self.rotation.1);
+        self.rotation.2 = norm(self.rotation.2);
+
+        self.position.0 = self.position.0.clamp(-1.0, 1.0);
+        self.position.1 = self.position.1.clamp(-1.0, 1.0);
+        self.position.2 = self.position.2.clamp(-1.0, 1.0);
     }
 
     pub fn set_aspect_ratio(&mut self, x: f32, y: f32) {
@@ -201,6 +221,8 @@ impl CameraState {
         self.rotation.0 += (self.rotating.0 as f32) * dist;
         self.rotation.1 += (self.rotating.1 as f32) * dist;
         self.rotation.2 += (self.rotating.2 as f32) * dist;
+
+        self.normalize();
     }
 
     pub fn process_input(&mut self, event: &WindowEvent) {
@@ -224,7 +246,8 @@ impl CameraState {
                     VirtualKeyCode::Key3  => self.rotating.2 =  pressed,
 
                     // reset rotation
-                    VirtualKeyCode::R => self.rotation = (0.5, 1.0, 0.0),
+                    VirtualKeyCode::T => self.rotation = (0.5, 1.0, 0.0),
+                    VirtualKeyCode::R => self.rotation = (0.5, 0.5, 0.0),
 
                     _ => (),
                 }
