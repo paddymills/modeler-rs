@@ -91,46 +91,55 @@ impl ApplicationContext for Application {
 
     fn draw_ui(&mut self, ctx: &Context, control_flow: &mut ControlFlow) {
         egui::TopBottomPanel::top("menu").show(ctx, |ui| {
-            ui.menu_button("Menu", |ui| {
-                if ui.button("Open").clicked() {
-                    self.open();
-                    ui.close_menu();
-                    
-                    ctx.request_repaint();
-                }
-
-                if ui.button("Save").clicked() {
-                    self.save();
-                    ui.close_menu();
-                    
-                    ctx.request_repaint();
-                }
-
-                ui.menu_button("Import", |ui| {
-                    if ui.button("Waveform (.obj)").clicked() {
-                        self.load();
+            ui.horizontal(|ui| {
+                ui.menu_button("Menu", |ui| {
+                    if ui.button("Open").clicked() {
+                        self.open();
                         ui.close_menu();
                         
                         ctx.request_repaint();
                     }
-                });
-                ui.menu_button("Export", |ui| {
-                    if ui.button("Stereolithography (.stl)").clicked() {
-                        eprintln!("impl stl export menu button");
+    
+                    if ui.button("Save").clicked() {
+                        self.save();
                         ui.close_menu();
+                        
+                        ctx.request_repaint();
+                    }
+    
+                    ui.menu_button("Import", |ui| {
+                        if ui.button("Waveform (.obj)").clicked() {
+                            self.load();
+                            ui.close_menu();
+                            
+                            ctx.request_repaint();
+                        }
+                    });
+                    ui.menu_button("Export", |ui| {
+                        if ui.button("Stereolithography (.stl)").clicked() {
+                            eprintln!("impl stl export menu button");
+                            ui.close_menu();
+                        }
+                    });
+    
+                    if ui.button("Quit").clicked() {
+                        control_flow.set_exit();
                     }
                 });
-
-                if ui.button("Quit").clicked() {
-                    control_flow.set_exit();
+    
+                #[cfg(debug_assertions)]
+                if ui.button("quick").clicked() {
+                    self.model.load_obj(&std::path::PathBuf::from("models/cube.obj"));
                 }
-            })
+            });
         });
 
         egui::SidePanel::left("toolbar").show(ctx, |ui| {
-            if ui.button("+ Sketch").clicked() {
-                eprintln!("sketcher not implemented");
-            }
+            ui.horizontal(|ui| {
+                if ui.button("+ Sketch").clicked() {
+                    eprintln!("sketcher not implemented");
+                }
+            });
         });
 
         egui::TopBottomPanel::bottom("statusbar").show(ctx, |ui| {
