@@ -60,7 +60,8 @@ impl ApplicationContext for Application {
         egui::TopBottomPanel::top("menu").show(ctx, |ui| {
             ui.menu_button("Menu", |ui| {
                 if ui.button("Open").clicked() {
-                    todo!("impl open of native file");
+                    eprintln!("impl open of native file");
+                    ui.close_menu();
                 }
 
                 ui.menu_button("Import", |ui| {
@@ -73,7 +74,8 @@ impl ApplicationContext for Application {
                 });
                 ui.menu_button("Export", |ui| {
                     if ui.button("Stereolithography (.stl)").clicked() {
-                        todo!("impl stl export menu button");
+                        eprintln!("impl stl export menu button");
+                        ui.close_menu();
                     }
                 });
 
