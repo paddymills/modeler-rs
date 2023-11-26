@@ -1,5 +1,5 @@
 
-use egui::Context;
+use egui::{Context, Layout, Align};
 use egui_glium::EguiGlium;
 use support::camera::CameraState;
 
@@ -126,25 +126,41 @@ impl ApplicationContext for Application {
                         control_flow.set_exit();
                     }
                 });
+
+                ui.horizontal(|ui| {
+                    if ui.button("+ Sketch").clicked() {
+                        eprintln!("sketcher not implemented");
+                    }
+                });
     
                 #[cfg(debug_assertions)]
-                if ui.button("quick").clicked() {
-                    self.model.load_obj(&std::path::PathBuf::from("models/cube.obj"));
-                }
+                ui.with_layout(Layout::right_to_left(Align::Center), |ui| {
+                    if ui.button("quick").clicked() {
+                        self.model.load_obj(&std::path::PathBuf::from("models/cube.obj"));
+                    }
+                });
             });
         });
 
-        egui::SidePanel::left("toolbar").show(ctx, |ui| {
-            ui.horizontal(|ui| {
-                if ui.button("+ Sketch").clicked() {
-                    eprintln!("sketcher not implemented");
-                }
-            });
-        });
+        // TODO: model history panel
+        // egui::SidePanel::left("toolbar").show(ctx, |ui| {
+        // });
 
         egui::TopBottomPanel::bottom("statusbar").show(ctx, |ui| {
-            ui.vertical_centered(|ui| {
-                ui.label(&self.status);
+            ui.horizontal_centered(|ui| {
+                ui.label(&format!(
+                    "🔄 <{:.2}, {:.2}, {:.2}> | ↔ <{:.2}, {:.2}, {:.2}>",
+                    self.camera.rotation.0,
+                    self.camera.rotation.1,
+                    self.camera.rotation.2,
+                    self.camera.position.0,
+                    self.camera.position.1,
+                    self.camera.position.2,
+                ));
+
+                ui.with_layout(Layout::right_to_left(Align::Center), |ui| {
+                    ui.label(&self.status);
+                });
             });
         });
     }
