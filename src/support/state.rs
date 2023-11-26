@@ -15,7 +15,7 @@ use winit::{
 pub trait ApplicationContext {
     const WINDOW_TITLE:&'static str;
     fn draw_frame(&mut self, display: &Display<WindowSurface>, ctx: &mut egui_glium::EguiGlium);
-    fn draw_menu(&mut self, ctx: &Context, control_flow: &mut ControlFlow);
+    fn draw_ui(&mut self, ctx: &Context, control_flow: &mut ControlFlow);
     fn new(display: &Display<WindowSurface>) -> Self;
     fn init(&mut self);
     fn update(&mut self) { }
@@ -58,7 +58,7 @@ impl<T: ApplicationContext + 'static> State<T> {
 
             let mut redraw = || {
                 let repaint_after = egui_glium_ctx.run(&state.window, |ctx| {
-                    state.context.draw_menu(ctx, control_flow);
+                    state.context.draw_ui(ctx, control_flow);
                 });
 
                 if repaint_after.is_zero() {
