@@ -27,12 +27,38 @@ impl Application {
     fn open(&mut self) {
         let path = native_dialog::FileDialog::new()
         .set_location(&std::env::current_dir().unwrap())
+            .add_filter("Phobia part", &["ph"])
+            .show_open_single_file()
+            .unwrap_or_default();
+        
+        if let Some(path) = path {
+            let _ = self.model.load(path);
+        };
+    }
+
+    fn save(&mut self) {
+        let path = native_dialog::FileDialog::new()
+        .set_location(&std::env::current_dir().unwrap())
+        .add_filter("Phobia part", &["ph"])
+            .show_save_single_file()
+            .unwrap_or_default();
+        
+        if let Some(mut path) = path {
+            path.set_extension("ph");
+
+            let _ = self.model.geometry.save(path);
+        };
+    }
+
+    fn load(&mut self) {
+        let path = native_dialog::FileDialog::new()
+        .set_location(&std::env::current_dir().unwrap())
             .add_filter("Wavefront", &["obj"])
             .show_open_single_file()
             .unwrap_or_default();
         
         if let Some(path) = path {
-            self.model.load(path);
+            self.model.load_obj(path);
         };
     }
 }
@@ -60,13 +86,22 @@ impl ApplicationContext for Application {
         egui::TopBottomPanel::top("menu").show(ctx, |ui| {
             ui.menu_button("Menu", |ui| {
                 if ui.button("Open").clicked() {
-                    eprintln!("impl open of native file");
+                    self.open();
                     ui.close_menu();
+                    
+                    ctx.request_repaint();
+                }
+
+                if ui.button("Save").clicked() {
+                    self.save();
+                    ui.close_menu();
+                    
+                    ctx.request_repaint();
                 }
 
                 ui.menu_button("Import", |ui| {
                     if ui.button("Waveform (.obj)").clicked() {
-                        self.open();
+                        self.load();
                         ui.close_menu();
                         
                         ctx.request_repaint();
