@@ -12,8 +12,13 @@ edition = "2021"
 [dependencies]
 glutin = "0.31"
 glutin-winit = "0.4"
-glium = { version = "0.33", git = "https://github.com/glium/glium" }
-winit = "0.29"
+# glium = { version = "0.33", git = "https://github.com/glium/glium" }
+glium = "0.33.0"
+winit = "0.28"
 
 obj = { version = "0.10", features = ["genmesh"] }
 native-dialog = "0.7.0"
+egui_glium = "0.23.0"
+egui = "0.23.0"
+# egui_glium = { version = "0.23.0", git = "https://github.com/paddymills/egui_glium" }
+# egui = { version = "0.23.0", git = "https://github.com/paddymills/egui" }

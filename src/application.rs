@@ -1,25 +1,26 @@
 
+use egui::Context;
+use egui_glium::EguiGlium;
 use support::camera::CameraState;
 
 use glium::{
     uniform,
     {Display, Surface},
-    vertex::VertexBufferAny,
     glutin::surface::WindowSurface,
 };
-use crate::support::camera;
+use winit::event_loop::ControlFlow;
 use crate::{
+    model::Model,
     shaders,
-    support::{self, ApplicationContext}
+    support::{self, camera, ApplicationContext}
 };
-use obj::Obj;
 
+#[derive(Debug)]
 pub struct Application {
-    pub vertex_buffer: Option<VertexBufferAny>,
     pub program: glium::Program,
     pub camera: CameraState,
 
-    model: Option<(Obj, bool)>
+    model: Model
 }
 
 impl Application {
@@ -31,7 +32,7 @@ impl Application {
             .unwrap_or_default();
         
         if let Some(path) = path {
-            self.model = Some((Obj::load(path).unwrap(), true))
+            self.model.load(path);
         };
     }
 }
@@ -45,20 +46,47 @@ impl ApplicationContext for Application {
         ).unwrap();
 
         Self {
-            vertex_buffer: None,
             program,
             camera: CameraState::new(),
-            model: None
+            model: Model::new()
         }
     }
 
     fn init(&mut self) {
-        self.open();
+        ()
     }
 
-    fn draw_frame(&mut self, display: &Display<WindowSurface>) {
-        if let None = self.vertex_buffer { () }
+    fn draw_menu(&mut self, ctx: &Context, control_flow: &mut ControlFlow) {
+        egui::TopBottomPanel::top("menu").show(ctx, |ui| {
+            ui.menu_button("Menu", |ui| {
+                if ui.button("Open").clicked() {
+                    eprintln!("impl open of native file");
+                    ui.close_menu();
+                }
 
+                ui.menu_button("Import", |ui| {
+                    if ui.button("Waveform (.obj)").clicked() {
+                        self.open();
+                        ui.close_menu();
+                        
+                        ctx.request_repaint();
+                    }
+                });
+                ui.menu_button("Export", |ui| {
+                    if ui.button("Stereolithography (.stl)").clicked() {
+                        eprintln!("impl stl export menu button");
+                        ui.close_menu();
+                    }
+                });
+
+                if ui.button("Quit").clicked() {
+                    control_flow.set_exit();
+                }
+            })
+        });
+    }
+
+    fn draw_frame(&mut self, display: &Display<WindowSurface>, egui_glium_ctx: &mut EguiGlium) {
         let mut frame = display.draw();
         // building the uniforms
         let uniforms = uniform! {
@@ -82,13 +110,17 @@ impl ApplicationContext for Application {
         frame.clear_color_and_depth((0.18, 0.25, 0.4, 1.0), 1.0);
         frame
             .draw(
-                self.vertex_buffer.as_ref().unwrap(),
+                self.model.vertex_buffer(display),
                 &glium::index::NoIndices(glium::index::PrimitiveType::TrianglesList),
                 &self.program,
                 &uniforms,
                 &params,
             )
             .unwrap();
+
+        // draw egui header
+        egui_glium_ctx.paint(display, &mut frame);
+
         frame.finish().unwrap();
     }
 
@@ -98,11 +130,5 @@ impl ApplicationContext for Application {
 
     fn update(&mut self) {
         self.camera.update(camera::UPDATE_DISTANCE);
-    }
-
-    fn update_model(&mut self, display: &Display<WindowSurface>) {
-        if let Some((model, true)) = &self.model {
-            self.vertex_buffer = Some(support::load_wavefront(display, &model));
-        }
     }
 }
