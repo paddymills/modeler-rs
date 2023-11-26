@@ -1,5 +1,8 @@
 
-use std::path::PathBuf;
+use std::{
+    fs::File,
+    path::PathBuf
+};
 
 use glium::{
     Display,
@@ -25,7 +28,18 @@ impl Model {
         }
     }
 
-    pub fn load(&mut self, path: PathBuf) {
+    pub fn load(&mut self, path: PathBuf) -> Result<(), obj::ObjError> {
+        let file = File::open(&path)?;
+        self.geometry.path = path;
+        self.geometry.data = ObjData::load_buf(file)?;
+
+        // invalidate cached vertex buffer
+        self.vb = None;
+
+        Ok(())
+    }
+
+    pub fn load_obj(&mut self, path: PathBuf) {
         self.geometry = Obj::load(path).unwrap();
 
         // invalidate cached vertex buffer
