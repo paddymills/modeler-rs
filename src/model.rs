@@ -39,7 +39,7 @@ impl Model {
         Ok(())
     }
 
-    pub fn load_obj(&mut self, path: PathBuf) {
+    pub fn load_obj(&mut self, path: &PathBuf) {
         self.geometry = Obj::load(path).unwrap();
 
         // invalidate cached vertex buffer
