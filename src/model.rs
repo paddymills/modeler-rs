@@ -27,6 +27,9 @@ impl Model {
 
     pub fn load(&mut self, path: PathBuf) {
         self.geometry = Obj::load(path).unwrap();
+
+        // invalidate cached vertex buffer
+        self.vb = None;
     }
 
     pub fn vertex_buffer(&mut self, display: &Display<WindowSurface>) -> &VertexBufferAny {
