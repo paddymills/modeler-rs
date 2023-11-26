@@ -20,7 +20,8 @@ pub struct Application {
     pub program: glium::Program,
     pub camera: CameraState,
 
-    model: Model
+    model: Model,
+    status: String
 }
 
 impl Application {
@@ -32,6 +33,7 @@ impl Application {
             .unwrap_or_default();
         
         if let Some(path) = path {
+            self.status = format!("model {} loaded", &path.to_str().unwrap().to_string());
             let _ = self.model.load(path);
         };
     }
@@ -46,7 +48,10 @@ impl Application {
         if let Some(mut path) = path {
             path.set_extension("ph");
 
-            let _ = self.model.geometry.save(path);
+            match self.model.geometry.save(&path) {
+                Ok(_) => self.status = format!("model {} saved", &path.to_str().unwrap()),
+                Err(e) => self.status = format!("model save failed: {}", e)
+            }
         };
     }
 
@@ -58,7 +63,8 @@ impl Application {
             .unwrap_or_default();
         
         if let Some(path) = path {
-            self.model.load_obj(path);
+            self.model.load_obj(&path);
+            self.status = format!("model {} loaded", &path.to_str().unwrap().to_string());
         };
     }
 }
@@ -74,7 +80,8 @@ impl ApplicationContext for Application {
         Self {
             program,
             camera: CameraState::new(),
-            model: Model::new()
+            model: Model::new(),
+            status: String::from("no model loaded"),
         }
     }
 
@@ -82,7 +89,7 @@ impl ApplicationContext for Application {
         ()
     }
 
-    fn draw_menu(&mut self, ctx: &Context, control_flow: &mut ControlFlow) {
+    fn draw_ui(&mut self, ctx: &Context, control_flow: &mut ControlFlow) {
         egui::TopBottomPanel::top("menu").show(ctx, |ui| {
             ui.menu_button("Menu", |ui| {
                 if ui.button("Open").clicked() {
@@ -118,6 +125,18 @@ impl ApplicationContext for Application {
                     control_flow.set_exit();
                 }
             })
+        });
+
+        egui::SidePanel::left("toolbar").show(ctx, |ui| {
+            if ui.button("+ Sketch").clicked() {
+                eprintln!("sketcher not implemented");
+            }
+        });
+
+        egui::TopBottomPanel::bottom("statusbar").show(ctx, |ui| {
+            ui.vertical_centered(|ui| {
+                ui.label(&self.status);
+            });
         });
     }
 
