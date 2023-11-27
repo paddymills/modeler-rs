@@ -48,6 +48,7 @@ impl Application {
         if let Some(mut path) = path {
             path.set_extension("ph");
 
+            // TODO: fix this. Obj saves faces with textures, not vertex normals
             match self.model.geometry.save(&path) {
                 Ok(_) => self.status = format!("model {} saved", &path.to_str().unwrap()),
                 Err(e) => self.status = format!("model save failed: {}", e)
