@@ -6,14 +6,15 @@ use glium::{
     vertex::VertexBuffer,
 };
 
+#[derive(Copy, Clone)]
+struct Vertex {
+    position: [f32; 3],
+    normal: [f32; 3],
+    texture: [f32; 2],
+}
+
 // Returns a vertex buffer that should be rendered as `TrianglesList`.
 pub fn load(display: &Display<WindowSurface>, data: &obj::Obj) -> glium::vertex::VertexBufferAny {
-    #[derive(Copy, Clone)]
-    struct Vertex {
-        position: [f32; 3],
-        normal: [f32; 3],
-        texture: [f32; 2],
-    }
 
     implement_vertex!(Vertex, position, normal, texture);
     
