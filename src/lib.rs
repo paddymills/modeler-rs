@@ -1,6 +1,7 @@
 
 
 pub mod application;
+pub mod buffer;
 pub mod formats;
 pub mod model;
 pub mod shaders;

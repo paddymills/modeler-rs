@@ -3,18 +3,14 @@ use glium::{
     implement_vertex,
     Display,
     glutin::surface::WindowSurface,
-    vertex::VertexBuffer,
+    vertex::VertexBuffer
 };
 
-#[derive(Copy, Clone)]
-struct Vertex {
-    position: [f32; 3],
-    normal: [f32; 3],
-    texture: [f32; 2],
-}
+use crate::buffer::{self, Vertex};
+
 
 // Returns a vertex buffer that should be rendered as `TrianglesList`.
-pub fn load(display: &Display<WindowSurface>, data: &obj::Obj) -> glium::vertex::VertexBufferAny {
+pub fn load(display: &Display<WindowSurface>, data: &obj::Obj) -> buffer::VertexBuffer {
 
     implement_vertex!(Vertex, position, normal, texture);
     
@@ -44,5 +40,5 @@ pub fn load(display: &Display<WindowSurface>, data: &obj::Obj) -> glium::vertex:
         }
     }
 
-    VertexBuffer::new(display, &vertex_data).unwrap().into()
+    VertexBuffer::new(display, &vertex_data).unwrap()
 }

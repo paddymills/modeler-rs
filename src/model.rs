@@ -6,18 +6,18 @@ use std::{
 
 use glium::{
     Display,
-    glutin::surface::WindowSurface,
-    vertex::VertexBufferAny
+    glutin::surface::WindowSurface
 };
 
 use obj::{Obj, ObjData};
 use crate::formats::wavefront;
+use crate::buffer::VertexBuffer;
 
 #[derive(Debug)]
 pub struct Model {
     pub geometry: Obj,
 
-    pub vb: Option<VertexBufferAny>
+    pub vb: Option<VertexBuffer>
 }
 
 impl Model {
@@ -46,7 +46,7 @@ impl Model {
         self.vb = None;
     }
 
-    pub fn vertex_buffer(&mut self, display: &Display<WindowSurface>) -> &VertexBufferAny {
+    pub fn vertex_buffer(&mut self, display: &Display<WindowSurface>) -> &VertexBuffer {
         if let None = self.vb {
             self.vb = Some( wavefront::load(display, &self.geometry) );
         }
