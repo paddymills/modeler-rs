@@ -247,7 +247,7 @@ impl CameraState {
 
                     // reset rotation
                     VirtualKeyCode::T => self.rotation = (0.5, 1.0, 0.0),
-                    VirtualKeyCode::R => self.rotation = (0.5, 0.5, 0.0),
+                    VirtualKeyCode::R => self.rotation = (0.0, 0.0, 0.0),
 
                     _ => (),
                 }
@@ -259,10 +259,10 @@ impl CameraState {
 
                     // TODO: refactor to impl this better
                     // TODO: rotation about axes, given current camera position
-                    // x-rotation about the z-axis
-                    self.rotating.2 = (x / x.abs()) as i8;
+                    // x-rotation about the y-axis
+                    self.rotating.1 = (x / x.abs()) as i8;
                     self.update(x.abs());
-                    self.rotating.2 = 0;
+                    self.rotating.1 = 0;
                     // y-rotation about the x-axis
                     self.rotating.0 = (y / y.abs()) as i8;
                     self.update(y.abs());
