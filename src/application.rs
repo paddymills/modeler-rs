@@ -137,7 +137,7 @@ impl ApplicationContext for Application {
                 #[cfg(debug_assertions)]
                 ui.with_layout(Layout::right_to_left(Align::Center), |ui| {
                     if ui.button("quick").clicked() {
-                        self.model.load_obj(&std::path::PathBuf::from("models/cube.obj"));
+                        self.model.load_obj(&std::path::PathBuf::from("models/cube2.obj"));
                     }
                 });
             });
