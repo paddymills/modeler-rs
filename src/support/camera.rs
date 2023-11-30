@@ -44,10 +44,10 @@ impl CameraState {
     }
 
     fn normalize(&mut self) {
-        let (min, max) = (0.0, 2.0 * 3.14159);
+        let (min, max) = (0.0, 2.0 * std::f32::consts::PI);
 
         let norm = |val| {
-                match val {
+            match val {
                 x if x < min => val + max,
                 x if x > max => val - max,
                 _ => val
@@ -58,9 +58,9 @@ impl CameraState {
         self.rotation.1 = norm(self.rotation.1);
         self.rotation.2 = norm(self.rotation.2);
 
-        self.position.0 = self.position.0.clamp(-1.0, 1.0);
-        self.position.1 = self.position.1.clamp(-1.0, 1.0);
-        self.position.2 = self.position.2.clamp(-1.0, 1.0);
+        // self.position.0 = self.position.0.clamp(-1.0, 1.0);
+        // self.position.1 = self.position.1.clamp(-1.0, 1.0);
+        // self.position.2 = self.position.2.clamp(-1.0, 1.0);
     }
 
     pub fn set_aspect_ratio(&mut self, x: f32, y: f32) {
