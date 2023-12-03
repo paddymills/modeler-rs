@@ -1,11 +1,11 @@
 use winit::{
     dpi::PhysicalPosition,
     event::{
-        WindowEvent, ElementState, KeyboardInput, VirtualKeyCode, MouseButton, MouseScrollDelta
+        WindowEvent, ElementState, KeyboardInput, MouseButton, MouseScrollDelta
     }
 };
 
-const MOVE_MULTIPLIER: f32 = 5.0;
+const MOVE_MULTIPLIER: f32 = 10.0;
 
 pub const UPDATE_DISTANCE: f32 = 0.01;
 const UP: (f32, f32, f32) = (0.0, 1.0, 0.0);
@@ -85,8 +85,8 @@ impl CameraState {
 
     pub fn get_perspective(&self) -> [[f32; 4]; 4] {
         let fov: f32 = 3.141592 / 2.0;
-        let zfar = 1024.0;
-        let znear = 0.1;
+        let zfar = 1.0;
+        let znear = 0.00001;
 
         let f = 1.0 / (fov / 2.0).tan();
 
@@ -229,28 +229,31 @@ impl CameraState {
     }
 
     pub fn process_input(&mut self, event: &WindowEvent) {
+        use winit::event::VirtualKeyCode::*;
+
         match event {
             WindowEvent::KeyboardInput { input: KeyboardInput { state, virtual_keycode: Some(keycode), .. }, .. } => {
                 let pressed = (state == &ElementState::Pressed) as i8;
                 match &keycode {
                     // movement
-                    VirtualKeyCode::Up   => self.moving.2 =  pressed,
-                    VirtualKeyCode::Down => self.moving.2 = -pressed,
-                    VirtualKeyCode::A      => self.moving.0 = -pressed,
-                    VirtualKeyCode::D      => self.moving.0 =  pressed,
-                    VirtualKeyCode::W      => self.moving.1 =  pressed,
-                    VirtualKeyCode::S      => self.moving.1 = -pressed,
+                    Up   => self.moving.2 =  pressed,
+                    Down => self.moving.2 = -pressed,
+                    A      => self.moving.0 = -pressed,
+                    D      => self.moving.0 =  pressed,
+                    W      => self.moving.1 =  pressed,
+                    S      => self.moving.1 = -pressed,
 
                     // rotation
-                    VirtualKeyCode::Left  => self.rotating.1 = -pressed,
-                    VirtualKeyCode::Right => self.rotating.1 =  pressed,
-                    VirtualKeyCode::Key1  => self.rotating.0 =  pressed,
-                    VirtualKeyCode::Key2  => self.rotating.1 =  pressed,
-                    VirtualKeyCode::Key3  => self.rotating.2 =  pressed,
+                    Left  => self.rotating.1 = -pressed,
+                    Right => self.rotating.1 =  pressed,
+                    Key1  => self.rotating.0 =  pressed,
+                    Key2  => self.rotating.1 =  pressed,
+                    Key3  => self.rotating.2 =  pressed,
 
                     // reset rotation
-                    VirtualKeyCode::T => self.rotation = (0.5, 1.0, 0.0),
-                    VirtualKeyCode::R => self.rotation = (0.0, 0.0, 0.0),
+                    T => self.rotation = (0.5, 1.0, 0.0),
+                    R => self.rotation = (0.0, 0.0, 0.0),
+                    P => self.position = (0.0, 0.0, 0.025),
 
                     _ => (),
                 }
