@@ -5,6 +5,7 @@ use winit::{
     }
 };
 
+const MOVE_MULTIPLIER: f32 = 5.0;
 
 pub const UPDATE_DISTANCE: f32 = 0.01;
 const UP: (f32, f32, f32) = (0.0, 1.0, 0.0);
@@ -22,6 +23,7 @@ pub struct CameraState {
     rotating: (i8, i8, i8),
 
     lmouse_held: bool,
+    mmouse_held: bool,
     mouse_pos: PhysicalPosition<f32>,
 }
 
@@ -39,6 +41,7 @@ impl CameraState {
             rotating: (0, 0, 0),
 
             lmouse_held: false,
+            mmouse_held: false,
             mouse_pos: PhysicalPosition::default()
         }
     }
@@ -261,12 +264,28 @@ impl CameraState {
                     // TODO: rotation about axes, given current camera position
                     // x-rotation about the y-axis
                     self.rotating.1 = (x / x.abs()) as i8;
-                    self.update(x.abs());
+                    self.update(x.abs() * MOVE_MULTIPLIER);
                     self.rotating.1 = 0;
                     // y-rotation about the x-axis
                     self.rotating.0 = (y / y.abs()) as i8;
-                    self.update(y.abs());
+                    self.update(y.abs() * MOVE_MULTIPLIER);
                     self.rotating.0 = 0;
+                }
+
+                if self.mmouse_held {
+                    let x = (position.x as f32 - self.mouse_pos.x) / self.width;
+                    let y = (position.y as f32 - self.mouse_pos.y) / self.height;
+
+                    // TODO: refactor to impl this better
+                    // TODO: movement about axes, given current camera position
+                    // x-movement about the x-axis
+                    self.moving.0 = (x / x.abs() * -1.0) as i8;
+                    self.update(x.abs() * MOVE_MULTIPLIER);
+                    self.moving.0 = 0;
+                    // y-movement about the z-axis
+                    self.moving.2 = (y / y.abs()) as i8;
+                    self.update(y.abs() * MOVE_MULTIPLIER);
+                    self.moving.2 = 0;
                 }
                 
                 self.mouse_pos.x = position.x as f32;
@@ -275,6 +294,7 @@ impl CameraState {
             WindowEvent::MouseInput { button, state, .. } => {
                 match button {
                     MouseButton::Left => self.lmouse_held = state == &ElementState::Pressed,
+                    MouseButton::Middle => self.mmouse_held = state == &ElementState::Pressed,
                     _ => ()
                 }
             },
@@ -286,10 +306,10 @@ impl CameraState {
 
                 // TODO: refactor to impl this better
                 self.moving.0 = (x / x.abs()) as i8;
-                self.update(x.abs());
+                self.update(x.abs() / self.width * MOVE_MULTIPLIER);
                 self.moving.0 = 0;
                 self.moving.1 = (y / y.abs()) as i8;
-                self.update(y.abs());
+                self.update(y.abs() / self.height * MOVE_MULTIPLIER);
                 self.moving.1 = 0;
             },
             WindowEvent::Resized(size) => self.set_aspect_ratio( size.width as f32, size.height as f32 ),
