@@ -29,11 +29,14 @@ pub fn load(display: &Display<WindowSurface>, data: &obj::Obj) -> buffer::Vertex
                         let texture = texture.unwrap_or([0.0, 0.0]);
                         let normal = normal.unwrap_or([0.0, 0.0, 0.0]);
 
-                        vertex_data.push(Vertex {
+                        let vertex = Vertex {
                             position,
                             normal,
                             texture,
-                        })
+                        };
+
+                        log::debug!("pushing {:?}", vertex);
+                        vertex_data.push(vertex)
                     }
                 },
             }

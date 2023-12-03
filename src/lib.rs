@@ -15,6 +15,8 @@ pub mod config {
     pub const TITLE: &str = "Phobia";
 }
 
+pub mod logging;
+
 // TODO: prelude for crate level types (i.e., Display)
 pub mod prelude {}
 

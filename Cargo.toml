@@ -22,4 +22,9 @@ native-dialog = "0.7.0"
 egui_glium = "0.23.0"
 egui = "0.23.0"
 
+# logging
+fern = "0.6.2"
+log = "0.4.20"
+chrono = "0.4.31"
+
 
