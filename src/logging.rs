@@ -5,10 +5,10 @@ pub fn init() -> Result<(), fern::InitError> {
     fern::Dispatch::new()
         .format(|out, message, record| {
             out.finish(format_args!(
-                "[{}]<{}::{}>{}",
+                "[{}|{}]<{}> {}",
                 chrono::Utc::now().format("%F %T"),
-                record.target(),
                 record.level(),
+                record.target(),
                 message
             ))
         })
