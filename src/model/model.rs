@@ -51,8 +51,12 @@ impl Model {
 
     pub fn vertex_buffer(&mut self, display: &Display<WindowSurface>) -> &VertexBuffer {
         if let None = self.vb {
-            // TODO: impl for multiple geometry entities
-            self.vb = Some( self.geometry[0].vertex_buffer(display) );
+            self.vb = match self.geometry.len() {
+                0 => Some(crate::buffer::empty_buffer(display)),
+
+                // TODO: impl for multiple geometry entities
+                _ => Some( self.geometry[0].vertex_buffer(display) )
+            };
         }
 
         // previous lines ensure this will not panic
