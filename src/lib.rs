@@ -17,8 +17,17 @@ pub mod config {
 
 pub mod logging;
 
-// TODO: prelude for crate level types (i.e., Display)
-pub mod prelude {}
+pub mod prelude {
+    pub type VertexBuffer = glium::vertex::VertexBuffer<Vertex>;
+    pub type Display = glium::Display<glium::glutin::surface::WindowSurface>;
+
+    #[derive(Debug, Copy, Clone)]
+    pub struct Vertex {
+        pub position: [f32; 3],
+        pub normal: [f32; 3],
+        pub texture: [f32; 2],
+    }
+}
 
 // TODO: theme colors
 pub mod theme {}

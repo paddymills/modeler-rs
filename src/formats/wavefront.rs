@@ -1,18 +1,11 @@
 
-use glium::{
-    implement_vertex,
-    Display,
-    glutin::surface::WindowSurface,
-    vertex::VertexBuffer
-};
-
-use crate::buffer::{self, Vertex};
+use crate::prelude::*;
 
 
 // Returns a vertex buffer that should be rendered as `TrianglesList`.
-pub fn load(display: &Display<WindowSurface>, data: &obj::Obj) -> buffer::VertexBuffer {
+pub fn load(display: &Display, data: &obj::Obj) -> VertexBuffer {
 
-    implement_vertex!(Vertex, position, normal, texture);
+    glium::implement_vertex!(Vertex, position, normal, texture);
     
     let mut vertex_data = Vec::new();
     

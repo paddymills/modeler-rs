@@ -6,7 +6,7 @@ use glium::{
 use obj::Obj;
 
 use super::*;
-use crate::{formats::wavefront, buffer::Vertex};
+use crate::{prelude::*, formats::wavefront};
 
 #[derive(Debug)]
 pub enum ModelEntity {

@@ -10,11 +10,7 @@ pub use block::Block;
 pub use sketch::Sketch;
 
 
-use crate::buffer::VertexBuffer;
-use glium::{
-    Display,
-    glutin::surface::WindowSurface
-};
+use crate::prelude::*;
 
 #[derive(Debug)]
 pub struct Plane {
@@ -37,6 +33,6 @@ pub struct Point3d {
 }
 
 pub trait ModelEntityObject {
-    fn vertex_buffer(&mut self, display: &Display<WindowSurface>) -> &VertexBuffer;
+    fn vertex_buffer(&mut self, display: &Display) -> &VertexBuffer;
 }
 

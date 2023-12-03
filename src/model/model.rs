@@ -10,7 +10,7 @@ use glium::{
 };
 
 use obj::{Obj, ObjData};
-use crate::buffer::VertexBuffer;
+use crate::prelude::VertexBuffer;
 use super::ModelEntity;
 
 
