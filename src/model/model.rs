@@ -10,28 +10,31 @@ use glium::{
 };
 
 use obj::{Obj, ObjData};
-use crate::formats::wavefront;
 use crate::buffer::VertexBuffer;
+use super::ModelEntity;
 
-#[derive(Debug)]
+
+#[derive(Debug, Default)]
 pub struct Model {
-    pub geometry: Obj,
-
-    pub vb: Option<VertexBuffer>
+    geometry: Vec<ModelEntity>,
+    vb: Option<VertexBuffer>
 }
 
 impl Model {
     pub fn new() -> Self {
-        Self {
-            geometry: Obj { data: ObjData::default(), path: PathBuf::new() },
-            vb: None
+        Self::default()
+    }
+
+    pub fn save(&mut self, path: &PathBuf) -> Result<(), obj::ObjError> {
+        match &self.geometry[0] {
+            ModelEntity::ImportedModel(obj) => obj.save(path),
+            _ => todo!()
         }
     }
 
     pub fn load(&mut self, path: PathBuf) -> Result<(), obj::ObjError> {
         let file = File::open(&path)?;
-        self.geometry.path = path;
-        self.geometry.data = ObjData::load_buf(file)?;
+        self.geometry = vec![ModelEntity::ImportedModel(Obj { data: ObjData::load_buf(file)?, path })];
 
         // invalidate cached vertex buffer
         self.vb = None;
@@ -40,7 +43,7 @@ impl Model {
     }
 
     pub fn load_obj(&mut self, path: &PathBuf) {
-        self.geometry = Obj::load(path).unwrap();
+        self.geometry = vec![ModelEntity::ImportedModel(Obj::load(path).unwrap())];
 
         // invalidate cached vertex buffer
         self.vb = None;
@@ -48,7 +51,8 @@ impl Model {
 
     pub fn vertex_buffer(&mut self, display: &Display<WindowSurface>) -> &VertexBuffer {
         if let None = self.vb {
-            self.vb = Some( wavefront::load(display, &self.geometry) );
+            // TODO: impl for multiple geometry entities
+            self.vb = Some( self.geometry[0].vertex_buffer(display) );
         }
 
         // previous lines ensure this will not panic
