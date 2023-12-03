@@ -9,6 +9,8 @@ edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
+default-run = "phobia"
+
 [dependencies]
 glutin = "0.31"
 glutin-winit = "0.4"
@@ -19,3 +21,5 @@ obj = { version = "0.10", features = ["genmesh"] }
 native-dialog = "0.7.0"
 egui_glium = "0.23.0"
 egui = "0.23.0"
+
+
