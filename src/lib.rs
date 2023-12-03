@@ -29,5 +29,10 @@ pub mod prelude {
     }
 }
 
+#[cfg(debug_assertions)]
+pub(crate) mod dev {
+    pub const QUICK_MODEL: &str = "models/trapezoid.obj";
+}
+
 // TODO: theme colors
 pub mod theme {}
