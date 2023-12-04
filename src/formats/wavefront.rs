@@ -4,8 +4,6 @@ use crate::prelude::*;
 
 // Returns a vertex buffer that should be rendered as `TrianglesList`.
 pub fn load(display: &Display, data: &obj::Obj) -> VertexBuffer {
-
-    glium::implement_vertex!(Vertex, position, normal, texture);
     
     let mut vertex_data = Vec::new();
     

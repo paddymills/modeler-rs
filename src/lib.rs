@@ -17,17 +17,7 @@ pub mod config {
 
 pub mod logging;
 
-pub mod prelude {
-    pub type VertexBuffer = glium::vertex::VertexBuffer<Vertex>;
-    pub type Display = glium::Display<glium::glutin::surface::WindowSurface>;
-
-    #[derive(Debug, Copy, Clone)]
-    pub struct Vertex {
-        pub position: [f32; 3],
-        pub normal: [f32; 3],
-        pub texture: [f32; 2],
-    }
-}
+pub mod prelude;
 
 #[cfg(debug_assertions)]
 pub(crate) mod dev {

@@ -9,6 +9,8 @@ fn main() {
         eprintln!("Logging failed to init <{}>", e);
     }
 
+    phobia::prelude::register();
+
     let _ = State::<Application>::run_loop();
 }
 
