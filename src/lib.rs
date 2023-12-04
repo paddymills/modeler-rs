@@ -7,6 +7,9 @@ pub mod model;
 pub mod shaders;
 pub mod support;
 
+mod state;
+pub use state::{ApplicationContext, State};
+
 // TODO: upgrade winit
 //  because of shared dependencies, this requires egui, glium and egui_glium
 //  to either use newer versions or be ported to use newer winit

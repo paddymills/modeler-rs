@@ -1,7 +1,6 @@
 
 use egui::{Context, Layout, Align};
 use egui_glium::EguiGlium;
-use support::camera::CameraState;
 
 use glium::{
     uniform,
@@ -12,7 +11,8 @@ use winit::event_loop::ControlFlow;
 use crate::{
     model::Model,
     shaders,
-    support::{self, camera, ApplicationContext}
+    support::camera::{self, CameraState},
+    ApplicationContext
 };
 
 #[derive(Debug)]
@@ -84,10 +84,6 @@ impl ApplicationContext for Application {
             model: Model::new(),
             status: String::from("no model loaded"),
         }
-    }
-
-    fn init(&mut self) {
-        ()
     }
 
     fn draw_ui(&mut self, ctx: &Context, control_flow: &mut ControlFlow) {
