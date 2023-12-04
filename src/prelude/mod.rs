@@ -1,6 +1,7 @@
 
 pub type Display = glium::Display<glium::glutin::surface::WindowSurface>;
 
+pub mod buffer;
 mod point;
 mod vertex;
 
