@@ -2,13 +2,11 @@
 
 pub mod application;
 pub mod buffer;
+pub mod camera;
 pub mod formats;
 pub mod model;
 pub mod shaders;
-pub mod support;
-
-mod state;
-pub use state::{ApplicationContext, State};
+pub mod state;
 
 // TODO: upgrade winit
 //  because of shared dependencies, this requires egui, glium and egui_glium

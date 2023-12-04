@@ -1,11 +1,7 @@
 
 use egui::Context;
 use egui_glium::EguiGlium;
-use glium::{
-    Display,
-    glutin::surface::WindowSurface,
-    backend::glutin::SimpleWindowBuilder,
-};
+use glium::backend::glutin::SimpleWindowBuilder;
 
 use winit::{
     event::{Event, WindowEvent},
@@ -13,18 +9,20 @@ use winit::{
     window::Window, dpi::PhysicalSize,
 };
 
+use crate::prelude::*;
+
 pub trait ApplicationContext {
     const WINDOW_TITLE:&'static str;
-    fn draw_frame(&mut self, display: &Display<WindowSurface>, ctx: &mut egui_glium::EguiGlium);
+    fn draw_frame(&mut self, display: &Display, ctx: &mut egui_glium::EguiGlium);
     fn draw_ui(&mut self, ctx: &Context, control_flow: &mut ControlFlow);
-    fn new(display: &Display<WindowSurface>) -> Self;
+    fn new(display: &Display) -> Self;
     fn update(&mut self) { }
     fn handle_window_event(&mut self, event: &WindowEvent, window: &winit::window::Window);
 }
 
 #[derive(Debug)]
 pub struct State<T> {
-    pub display: Display<WindowSurface>,
+    pub display: Display,
     pub window: Window,
     pub context: T,
 

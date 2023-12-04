@@ -1,7 +1,7 @@
 
 use phobia::{
     application::Application,
-    State,
+    state::State,
 };
 
 fn main() -> ! {
