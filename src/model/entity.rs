@@ -29,3 +29,16 @@ impl ModelEntity {
         }
     }
 }
+
+impl ToString for ModelEntity {
+    
+    fn to_string(&self) -> String {
+        use ModelEntity::*;
+
+        match self {
+            ImportedModel(_) => "ImportedModel",
+            Sketch(_) => "Sketch",
+            Block(_) => "Block",
+        }.into()
+    }
+}

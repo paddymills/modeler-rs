@@ -2,13 +2,14 @@
 use egui::{Context, Layout, Align};
 use egui_glium::EguiGlium;
 
-use glium::{ uniform, Surface};
+use glium::{uniform, Surface};
 use winit::event_loop::ControlFlow;
 use winit::event::WindowEvent;
 
 use crate::prelude::*;
 use crate::{
     model::Model,
+    modes::ApplicationMode,
     shaders,
     camera::{self, CameraState},
     state::ApplicationContext
@@ -20,6 +21,8 @@ pub struct Application {
     pub camera: CameraState,
 
     model: Model,
+    mode: ApplicationMode,
+
     status: String
 }
 
@@ -81,8 +84,17 @@ impl ApplicationContext for Application {
             program,
             camera: CameraState::new(),
             model: Model::new(),
+            mode: ApplicationMode::Modeling,
             status: String::from("no model loaded"),
         }
+    }
+
+    fn update(&mut self) {
+        self.camera.update(camera::UPDATE_DISTANCE);
+    }
+
+    fn handle_window_event(&mut self, event: &WindowEvent, _window: &winit::window::Window) {
+        self.camera.process_input(&event);
     }
 
     fn draw_ui(&mut self, ctx: &Context, control_flow: &mut ControlFlow) {
@@ -125,7 +137,8 @@ impl ApplicationContext for Application {
 
                 ui.horizontal(|ui| {
                     if ui.button("+ Sketch").clicked() {
-                        eprintln!("sketcher not implemented");
+                        self.camera.set_rotation((0.0, 0.0, 0.0));
+                        self.mode = ApplicationMode::Sketching;
                     }
                 });
     
@@ -138,9 +151,12 @@ impl ApplicationContext for Application {
             });
         });
 
-        // TODO: model history panel
-        // egui::SidePanel::left("toolbar").show(ctx, |ui| {
-        // });
+        // model history panel
+        egui::SidePanel::left("toolbar").show(ctx, |ui| {
+            for geo in self.model.entities() {
+                ui.label(geo);
+            }
+        });
 
         egui::TopBottomPanel::bottom("statusbar").show(ctx, |ui| {
             ui.horizontal_centered(|ui| {
@@ -197,13 +213,5 @@ impl ApplicationContext for Application {
         egui_glium_ctx.paint(display, &mut frame);
 
         frame.finish().unwrap();
-    }
-
-    fn handle_window_event(&mut self, event: &WindowEvent, _window: &winit::window::Window) {
-        self.camera.process_input(&event);
-    }
-
-    fn update(&mut self) {
-        self.camera.update(camera::UPDATE_DISTANCE);
     }
 }

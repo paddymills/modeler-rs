@@ -22,12 +22,19 @@ pub struct Model {
 
 impl Model {
     pub fn new() -> Self {
-        // Self::default()
-        Self {
-            geometry: vec![ModelEntity::Block(Block::two_points(Point3d { x: -1.0, y: -1.0, z: -1.0 }, Point3d { x: 1.0, y: 1.0, z: 1.0 }))],
+        // Self {
+        //     geometry: vec![ModelEntity::Block(Block::two_points(Point3d { x: -1.0, y: -1.0, z: -1.0 }, Point3d { x: 1.0, y: 1.0, z: 1.0 }))],
+            
+        //     ..Default::default()
+        // }
 
-            ..Default::default()
-        }
+        Self::default()
+    }
+
+    pub fn entities(&self) -> Vec<String> {
+        self.geometry.iter()
+            .map(ToString::to_string)
+            .collect()
     }
 
     pub fn save(&mut self, path: &PathBuf) -> Result<(), obj::ObjError> {
@@ -57,7 +64,7 @@ impl Model {
     pub fn vertex_buffer(&mut self, display: &Display<WindowSurface>) -> &VertexBuffer {
         if let None = self.vb {
             self.vb = match self.geometry.len() {
-                0 => Some(crate::buffer::empty_buffer(display)),
+                0 => Some(crate::prelude::buffer::empty_buffer(display)),
 
                 // TODO: impl for multiple geometry entities
                 _ => Some( self.geometry[0].vertex_buffer(display) )
