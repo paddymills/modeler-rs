@@ -55,6 +55,7 @@ impl Model {
     }
 
     pub fn load_obj(&mut self, path: &PathBuf) {
+        log::debug!("loading .obj file `{}`", path.to_str().unwrap_or_default());
         self.geometry = vec![ModelEntity::ImportedModel(Obj::load(path).unwrap())];
 
         // invalidate cached vertex buffer
@@ -66,8 +67,21 @@ impl Model {
             self.vb = match self.geometry.len() {
                 0 => Some(crate::prelude::buffer::empty_buffer(display)),
 
-                // TODO: impl for multiple geometry entities
-                _ => Some( self.geometry[0].vertex_buffer(display) )
+                _ => {
+                    // should we have <ModelEntity>.vertices take in a vec?
+                    //  Might be performance overhead from the flattening which probably copies items
+                    let vertices: Vec<Vertex> = self.geometry.iter()
+                        .flat_map(|g| g.vertices())
+                        .collect();
+
+                    match VertexBuffer::new(display, &vertices) {
+                        Ok(buffer) => Some( buffer ),
+                        Err(e) => {
+                            log::error!("Failed to produce VertexBuffer <{}>", e);
+                            Some(crate::prelude::buffer::empty_buffer(display))
+                        }
+                    }
+                }
             };
         }
 

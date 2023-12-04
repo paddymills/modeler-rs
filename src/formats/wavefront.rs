@@ -3,7 +3,7 @@ use crate::prelude::*;
 
 
 // Returns a vertex buffer that should be rendered as `TrianglesList`.
-pub fn load(display: &Display, data: &obj::Obj) -> VertexBuffer {
+pub fn load(data: &obj::Obj) -> Vec<Vertex> {
     
     let mut vertex_data = Vec::new();
     
@@ -26,7 +26,7 @@ pub fn load(display: &Display, data: &obj::Obj) -> VertexBuffer {
                             texture,
                         };
 
-                        log::debug!("pushing {:?}", vertex);
+                        log::debug!("adding {:?}", vertex);
                         vertex_data.push(vertex)
                     }
                 },
@@ -34,5 +34,5 @@ pub fn load(display: &Display, data: &obj::Obj) -> VertexBuffer {
         }
     }
 
-    VertexBuffer::new(display, &vertex_data).unwrap()
+    vertex_data
 }

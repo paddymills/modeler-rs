@@ -34,11 +34,9 @@ impl Block {
 }
 
 impl super::ModelEntityObject for Block {
-    fn vertex_buffer(&self, display: &crate::prelude::Display) -> VertexBuffer {
-        let vertices: Vec<Vertex> = self.points().into_iter()
+    fn vertices(&self) -> Vec<Vertex> {
+        self.points().into_iter()
             .map(Into::into)
-            .collect();
-
-        VertexBuffer::new(display, &vertices).unwrap()
+            .collect()
     }
 }

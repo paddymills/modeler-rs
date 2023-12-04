@@ -16,6 +16,6 @@ pub use sketch::Sketch;
 use crate::prelude::*;
 
 pub trait ModelEntityObject {
-    fn vertex_buffer(&self, display: &Display) -> VertexBuffer;
+    fn vertices(&self) -> Vec<Vertex>;
 }
 

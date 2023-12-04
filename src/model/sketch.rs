@@ -10,12 +10,10 @@ pub struct Sketch {
 }
 
 impl super::ModelEntityObject for Sketch {
-    fn vertex_buffer(&self, display: &crate::prelude::Display) -> VertexBuffer {
-        let vertices: Vec<Vertex> = self.points
+    fn vertices(&self) -> Vec<Vertex> {
+        self.points
             .iter()
             .map(|p| self.plane.vertex(p))
-            .collect();
-
-        VertexBuffer::new(display, &vertices).unwrap()
+            .collect()
     }
 }

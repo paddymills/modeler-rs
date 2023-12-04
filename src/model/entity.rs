@@ -1,8 +1,4 @@
 
-use glium::{
-    Display,
-    glutin::surface::WindowSurface
-};
 use obj::Obj;
 
 use super::*;
@@ -19,12 +15,12 @@ pub enum ModelEntity {
 }
 
 impl ModelEntity {
-    pub fn vertex_buffer(&self, display: &Display<WindowSurface>) -> glium::VertexBuffer<Vertex> {
+    pub fn vertices(&self) -> Vec<Vertex> {
         use ModelEntity::*;
 
         match self {
-            ImportedModel(obj) => wavefront::load(display, obj),
-            Block(bl) => bl.vertex_buffer(display),
+            ImportedModel(obj) => wavefront::load(obj),
+            Block(bl) => bl.vertices(),
             _ => todo!()
         }
     }
