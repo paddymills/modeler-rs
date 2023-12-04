@@ -13,11 +13,13 @@ use crate::prelude::*;
 
 pub trait ApplicationContext {
     const WINDOW_TITLE:&'static str;
-    fn draw_frame(&mut self, display: &Display, ctx: &mut egui_glium::EguiGlium);
-    fn draw_ui(&mut self, ctx: &Context, control_flow: &mut ControlFlow);
+
     fn new(display: &Display) -> Self;
     fn update(&mut self) { }
-    fn handle_window_event(&mut self, event: &WindowEvent, window: &winit::window::Window);
+    fn handle_window_event(&mut self, event: &WindowEvent, window: &Window);
+
+    fn draw_frame(&mut self, display: &Display, ctx: &mut EguiGlium);
+    fn draw_ui(&mut self, ctx: &Context, control_flow: &mut ControlFlow);
 }
 
 #[derive(Debug)]
@@ -38,13 +40,7 @@ impl<T: ApplicationContext + 'static> State<T> {
 
         let context = T::new(&display);
 
-        Self {
-            display,
-            window,
-            context,
-
-            event_loop,
-        }
+        Self { display, window, context, event_loop }
     }
 
     /// Start the event_loop and keep rendering frames until the program is closed
