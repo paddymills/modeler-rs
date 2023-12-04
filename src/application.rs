@@ -2,17 +2,16 @@
 use egui::{Context, Layout, Align};
 use egui_glium::EguiGlium;
 
-use glium::{
-    uniform,
-    {Display, Surface},
-    glutin::surface::WindowSurface,
-};
+use glium::{ uniform, Surface};
 use winit::event_loop::ControlFlow;
+use winit::event::WindowEvent;
+
+use crate::prelude::*;
 use crate::{
     model::Model,
     shaders,
-    support::camera::{self, CameraState},
-    ApplicationContext
+    camera::{self, CameraState},
+    state::ApplicationContext
 };
 
 #[derive(Debug)]
@@ -73,7 +72,7 @@ impl Application {
 impl ApplicationContext for Application {
     const WINDOW_TITLE:&'static str = crate::config::TITLE;
 
-    fn new(display: &Display<WindowSurface>) -> Self {
+    fn new(display: &Display) -> Self {
         let program = glium::Program::from_source(
             display, shaders::VERTEX_SRC, shaders::FRAGMENT_SRC, None
         ).unwrap();
@@ -162,7 +161,7 @@ impl ApplicationContext for Application {
         });
     }
 
-    fn draw_frame(&mut self, display: &Display<WindowSurface>, egui_glium_ctx: &mut EguiGlium) {
+    fn draw_frame(&mut self, display: &Display, egui_glium_ctx: &mut EguiGlium) {
         let mut frame = display.draw();
         // building the uniforms
         let uniforms = uniform! {
@@ -200,7 +199,7 @@ impl ApplicationContext for Application {
         frame.finish().unwrap();
     }
 
-    fn handle_window_event(&mut self, event: &winit::event::WindowEvent, _window: &winit::window::Window) {
+    fn handle_window_event(&mut self, event: &WindowEvent, _window: &winit::window::Window) {
         self.camera.process_input(&event);
     }
 
