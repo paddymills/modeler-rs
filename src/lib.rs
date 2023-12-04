@@ -22,7 +22,7 @@ pub mod prelude;
 
 #[cfg(debug_assertions)]
 pub(crate) mod dev {
-    pub const QUICK_MODEL: &str = "models/trapezoid.obj";
+    pub const QUICK_MODEL: &str = "models/twocubes_blender.obj";
 }
 
 // TODO: theme colors
