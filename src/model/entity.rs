@@ -24,6 +24,7 @@ impl ModelEntity {
 
         match self {
             ImportedModel(obj) => wavefront::load(display, obj),
+            Block(bl) => bl.vertex_buffer(display),
             _ => todo!()
         }
     }

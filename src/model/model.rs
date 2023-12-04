@@ -11,7 +11,7 @@ use glium::{
 
 use obj::{Obj, ObjData};
 use crate::prelude::VertexBuffer;
-use super::ModelEntity;
+use super::*;
 
 
 #[derive(Debug, Default)]
@@ -22,7 +22,12 @@ pub struct Model {
 
 impl Model {
     pub fn new() -> Self {
-        Self::default()
+        // Self::default()
+        Self {
+            geometry: vec![ModelEntity::Block(Block::two_points(Point3d { x: -1.0, y: -1.0, z: -1.0 }, Point3d { x: 1.0, y: 1.0, z: 1.0 }))],
+
+            ..Default::default()
+        }
     }
 
     pub fn save(&mut self, path: &PathBuf) -> Result<(), obj::ObjError> {
