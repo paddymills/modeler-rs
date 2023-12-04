@@ -33,8 +33,8 @@ impl CameraState {
             width: 1024.0,
             height: 768.0,
 
-            position: (0.1, 0.1, 1.0),
-            rotation: (0.5, 1.0, 0.0),
+            position: (0.0, 0.0, 0.025),
+            rotation: (0.0, 0.0, 0.0),
             direction: (0.0, 0.0, -1.0),
 
             moving: (0, 0, 0),
