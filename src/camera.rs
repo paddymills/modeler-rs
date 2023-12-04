@@ -79,6 +79,10 @@ impl CameraState {
         self.direction = dir;
     }
 
+    pub fn set_rotation(&mut self, dir: (f32, f32, f32)) {
+        self.rotation = dir;
+    }
+
     pub fn get_aspect_ratio(&self) -> f32 {
         self.width / self.height
     }
