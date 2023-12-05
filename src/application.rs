@@ -1,214 +1,82 @@
 
-use egui::{Context, Layout, Align};
-use egui_glium::EguiGlium;
-
-use glium::{uniform, Surface};
-use winit::event_loop::ControlFlow;
-use winit::event::WindowEvent;
-
-use crate::prelude::*;
-use crate::{
-    model::Model,
-    environment::*,
-    shaders,
-    camera::{self, CameraState},
-    state::ApplicationContext
+use glium::backend::glutin::SimpleWindowBuilder;
+use winit::{
+    event::{Event, WindowEvent},
+    event_loop::{EventLoopBuilder, ControlFlow},
+    window::Window, dpi::PhysicalSize,
 };
 
+use crate::prelude::*;
+pub type EventLoop = winit::event_loop::EventLoop<()>;
+
+pub trait ApplicationState {
+    fn new(display: &Display, window: &Window, event_loop: &EventLoop) -> Self;
+    fn update(&mut self) { }
+    fn handle_window_event(&mut self, event: &WindowEvent, window: &Window);
+
+    // TODO: combine these
+    fn draw_frame(&mut self, display: &Display);
+    fn draw_ui(&mut self, control_flow: &mut ControlFlow, window: &Window);
+}
+
 #[derive(Debug)]
-pub struct Application {
-    pub program: glium::Program,
-    pub camera: CameraState,
-
-    model: Model,
-    pub mode: Box<dyn ApplicationMode>,
-
-    status: String
+pub struct Application<S> {
+    display: Display,
+    window: Window,
+    event_loop: EventLoop,
+    state: S
 }
 
-impl Application {
-    fn open(&mut self) {
-        let path = native_dialog::FileDialog::new()
-        .set_location(&std::env::current_dir().unwrap())
-            .add_filter("Phobia part", &["ph"])
-            .show_open_single_file()
-            .unwrap_or_default();
-        
-        if let Some(path) = path {
-            self.status = format!("model {} loaded", &path.to_str().unwrap().to_string());
-            let _ = self.model.load(path);
-        };
+impl<S: ApplicationState + 'static> Application<S> {
+    /// create application and run it
+    pub fn run() -> ! {
+        crate::prelude::register();
+        let app = Self::new();
+
+        app.event_loop()
     }
 
-    fn save(&mut self) {
-        let path = native_dialog::FileDialog::new()
-        .set_location(&std::env::current_dir().unwrap())
-        .add_filter("Phobia part", &["ph"])
-            .show_save_single_file()
-            .unwrap_or_default();
-        
-        if let Some(mut path) = path {
-            path.set_extension("ph");
+    fn new() -> Self {
+        let event_loop = EventLoopBuilder::new().build();
+        let (window, display) = SimpleWindowBuilder::new()
+            .with_title(crate::config::TITLE)
+            .build(&event_loop);
 
-            // TODO: fix this. Obj saves faces with textures, not vertex normals
-            match self.model.save(&path) {
-                Ok(_) => self.status = format!("model {} saved", &path.to_str().unwrap()),
-                Err(e) => self.status = format!("model save failed: {}", e)
+        let state = S::new(&display, &window, &event_loop);
+
+        Self { display, window, event_loop, state }
+    }
+
+    fn event_loop(mut self) -> ! {
+        self.event_loop.run(move |event, _window_target, control_flow| {
+            match event {
+                // By requesting a redraw in response to a RedrawEventsCleared event we get continuous rendering.
+                // This is needed, otherwise camera movements can be laggy.
+                Event::RedrawEventsCleared => self.window.request_redraw(),
+
+                // set the window size (will call WindowEvent::Resized in the camera)
+                // this is a hack to correctly set the inital aspect ratio for the camera
+                Event::Resumed => {
+                    // TODO: cache window size so that last used window size persists
+                    let _ = self.window.set_inner_size(PhysicalSize { width: 800, height: 600 });
+                },
+                Event::RedrawRequested(_) => {
+                    self.state.update();
+
+                    self.state.draw_ui(control_flow, &self.window);
+                    self.state.draw_frame(&self.display);
+                }
+                Event::WindowEvent { event, .. } => match event {
+                    WindowEvent::Resized(new_size) => self.display.resize(new_size.into()),
+
+                    // Exit the event loop when requested
+                    WindowEvent::CloseRequested => control_flow.set_exit(),
+
+                    // dispatch unmatched events to handler
+                    event => self.state.handle_window_event(&event, &self.window)
+                },
+                _ => (),
             }
-        };
-    }
-
-    fn load(&mut self) {
-        let path = native_dialog::FileDialog::new()
-        .set_location(&std::env::current_dir().unwrap())
-            .add_filter("Wavefront", &["obj"])
-            .show_open_single_file()
-            .unwrap_or_default();
-        
-        if let Some(path) = path {
-            self.model.load_obj(&path);
-            self.status = format!("model {} loaded", &path.to_str().unwrap().to_string());
-        };
-    }
-}
-
-impl ApplicationContext for Application {
-    const WINDOW_TITLE:&'static str = crate::config::TITLE;
-
-    fn new(display: &Display) -> Self {
-        let program = glium::Program::from_source(
-            display, shaders::VERTEX_SRC, shaders::FRAGMENT_SRC, None
-        ).unwrap();
-
-        Self {
-            program,
-            camera: CameraState::new(),
-            model: Model::new(),
-            mode: Box::new(Modeling::new()),
-            status: String::from("no model loaded"),
-        }
-    }
-
-    fn update(&mut self) {
-        self.camera.update(camera::UPDATE_DISTANCE);
-    }
-
-    fn handle_window_event(&mut self, event: &WindowEvent, _window: &winit::window::Window) {
-        self.camera.process_input(&event);
-    }
-
-    fn draw_ui(&mut self, ctx: &Context, control_flow: &mut ControlFlow) {
-        egui::TopBottomPanel::top("menu").show(ctx, |ui| {
-            ui.horizontal(|ui| {
-                ui.menu_button("Menu", |ui| {
-                    if ui.button("Open").clicked() {
-                        self.open();
-                        ui.close_menu();
-                        
-                        ctx.request_repaint();
-                    }
-    
-                    if ui.button("Save").clicked() {
-                        self.save();
-                        ui.close_menu();
-                        
-                        ctx.request_repaint();
-                    }
-    
-                    ui.menu_button("Import", |ui| {
-                        if ui.button("Waveform (.obj)").clicked() {
-                            self.load();
-                            ui.close_menu();
-                            
-                            ctx.request_repaint();
-                        }
-                    });
-                    ui.menu_button("Export", |ui| {
-                        if ui.button("Stereolithography (.stl)").clicked() {
-                            eprintln!("impl stl export menu button");
-                            ui.close_menu();
-                        }
-                    });
-    
-                    if ui.button("Quit").clicked() {
-                        control_flow.set_exit();
-                    }
-                });
-
-                ui.horizontal(|ui| {
-                    self.mode.draw_toolbar(self, ui);
-                });
-    
-                #[cfg(debug_assertions)]
-                ui.with_layout(Layout::right_to_left(Align::Center), |ui| {
-                    if ui.button("quick").clicked() {
-                        self.model.load_obj(&std::path::PathBuf::from(crate::dev::QUICK_MODEL));
-                    }
-                });
-            });
-        });
-
-        // model history panel
-        egui::SidePanel::left("toolbar").show(ctx, |ui| {
-            for geo in self.model.entities() {
-                ui.label(geo);
-            }
-        });
-
-        egui::TopBottomPanel::bottom("statusbar").show(ctx, |ui| {
-            ui.horizontal_centered(|ui| {
-                ui.label(&format!(
-                    "🔄 <{:.2}, {:.2}, {:.2}> | ↔ <{:.2}, {:.2}, {:.2}>",
-                    self.camera.rotation.0,
-                    self.camera.rotation.1,
-                    self.camera.rotation.2,
-                    self.camera.position.0,
-                    self.camera.position.1,
-                    self.camera.position.2,
-                ));
-
-                ui.with_layout(Layout::right_to_left(Align::Center), |ui| {
-                    ui.label(&self.status);
-                });
-            });
-        });
-    }
-
-    fn draw_frame(&mut self, display: &Display, egui_glium_ctx: &mut EguiGlium) {
-        let mut frame = display.draw();
-        // building the uniforms
-        let uniforms = uniform! {
-            persp_matrix: self.camera.get_perspective(),
-            view_matrix: self.camera.get_view(),
-            rotx_matrix: self.camera.get_x_rotation(),
-            roty_matrix: self.camera.get_y_rotation(),
-            rotz_matrix: self.camera.get_z_rotation(),
-        };
-
-        // draw parameters
-        let params = glium::DrawParameters {
-            depth: glium::Depth {
-                test: glium::DepthTest::IfLess,
-                write: true,
-                ..Default::default()
-            },
-            ..Default::default()
-        };
-
-        frame.clear_color_and_depth((0.18, 0.25, 0.4, 1.0), 1.0);
-        frame
-            .draw(
-                self.model.vertex_buffer(display),
-                &glium::index::NoIndices(glium::index::PrimitiveType::TrianglesList),
-                &self.program,
-                &uniforms,
-                &params,
-            )
-            .unwrap();
-
-        // draw egui header
-        egui_glium_ctx.paint(display, &mut frame);
-
-        frame.finish().unwrap();
+        })
     }
 }

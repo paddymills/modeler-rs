@@ -1,12 +1,17 @@
 
 
-pub mod application;
+mod application;
+mod state;
+pub use application::Application;
+pub use state::State;
+
 pub mod camera;
 pub mod formats;
+pub mod logging;
+pub mod prelude;
 pub mod model;
-pub mod environment;
+pub mod env;
 pub mod shaders;
-pub mod state;
 
 // TODO: upgrade winit
 //  because of shared dependencies, this requires egui, glium and egui_glium
@@ -16,9 +21,6 @@ pub mod config {
     pub const TITLE: &str = "Phobia";
 }
 
-pub mod logging;
-
-pub mod prelude;
 
 #[cfg(debug_assertions)]
 pub(crate) mod dev {

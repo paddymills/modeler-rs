@@ -1,6 +1,6 @@
 use winit::event::{WindowEvent, ElementState, MouseButton};
 
-use crate::{prelude::*, application::Application};
+use crate::prelude::*;
 
 #[derive(Debug, Default)]
 pub struct Sketcher {
@@ -18,8 +18,8 @@ impl Sketcher {
     }
 }
 
-impl super::ApplicationMode for Sketcher {
-    fn draw_toolbar(&self, app: &mut Application, ui: &mut egui::Ui) {
+impl super::ApplicationEnvironment for Sketcher {
+    fn draw_toolbar(&self, ui: &mut egui::Ui) {
         if ui.button("Finish sketch (right-click)").clicked() {
             self.finalize();
         }
