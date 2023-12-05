@@ -2,6 +2,7 @@
 use std::path::PathBuf;
 
 pub enum MenuResult {
+    New,
     Open(PathBuf),
     Save(PathBuf),
     ImportObj(PathBuf),
@@ -11,6 +12,11 @@ pub fn ui(ui: &mut egui::Ui, control_flow: &mut winit::event_loop::ControlFlow) 
     let mut result = None;
     
     ui.menu_button("Menu", |ui| {
+        if ui.button("New").clicked() {
+            log::debug!("Menu > New");
+            result = Some(MenuResult::New);
+        }
+
         if ui.button("Open").clicked() {
             log::debug!("Menu > Open");
             result = open().map(|path| MenuResult::Open(path));
