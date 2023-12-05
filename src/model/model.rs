@@ -54,12 +54,18 @@ impl Model {
         Ok(())
     }
 
-    pub fn load_obj(&mut self, path: &PathBuf) {
-        log::debug!("loading .obj file `{}`", path.to_str().unwrap_or_default());
-        self.geometry = vec![ModelEntity::ImportedModel(Obj::load(path).unwrap())];
+    pub fn load_obj(&mut self, path: &PathBuf) -> Result<(), obj::ObjError> {
+        if let Some(pathstr) = path.to_str() {
+            log::debug!("loading .obj file `{}`", pathstr);
+        }
+
+        let loaded = Obj::load(path)?;
+        self.geometry = vec![ModelEntity::ImportedModel(loaded)];
 
         // invalidate cached vertex buffer
         self.vb = None;
+
+        Ok(())
     }
 
     pub fn vertex_buffer(&mut self, display: &Display<WindowSurface>) -> &VertexBuffer {

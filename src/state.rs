@@ -8,6 +8,7 @@ use winit::{
 };
 
 use crate::prelude::*;
+use crate::ui::menu::MenuResult;
 use crate::{
     env,
     camera::CameraState,
@@ -26,53 +27,6 @@ pub struct State {
     
     model: Model,
     status: String,
-}
-
-impl State {
-    // TODO: move open, save and load to Application
-    fn open(&mut self) {
-        let path = native_dialog::FileDialog::new()
-        .set_location(&std::env::current_dir().unwrap())
-            .add_filter("Phobia part", &["ph"])
-            .show_open_single_file()
-            .unwrap_or_default();
-        
-        if let Some(path) = path {
-            self.status = format!("model {} loaded", &path.to_str().unwrap().to_string());
-            let _ = self.model.load(path);
-        };
-    }
-
-    fn save(&mut self) {
-        let path = native_dialog::FileDialog::new()
-        .set_location(&std::env::current_dir().unwrap())
-        .add_filter("Phobia part", &["ph"])
-            .show_save_single_file()
-            .unwrap_or_default();
-        
-        if let Some(mut path) = path {
-            path.set_extension("ph");
-
-            // TODO: fix this. Obj saves faces with textures, not vertex normals
-            match self.model.save(&path) {
-                Ok(_) => self.status = format!("model {} saved", &path.to_str().unwrap()),
-                Err(e) => self.status = format!("model save failed: {}", e)
-            }
-        };
-    }
-
-    fn load(&mut self) {
-        let path = native_dialog::FileDialog::new()
-        .set_location(&std::env::current_dir().unwrap())
-            .add_filter("Wavefront", &["obj"])
-            .show_open_single_file()
-            .unwrap_or_default();
-        
-        if let Some(path) = path {
-            self.model.load_obj(&path);
-            self.status = format!("model {} loaded", &path.to_str().unwrap().to_string());
-        };
-    }
 }
 
 impl ApplicationState for State {
@@ -112,44 +66,28 @@ impl ApplicationState for State {
         self.ui.run(&window, |ctx| {
             egui::TopBottomPanel::top("menu").show(&ctx, |ui| {
                 ui.horizontal(|ui| {
-                    // TODO: move to dedicated menu struct/fn
-                    ui.menu_button("Menu", |ui| {
-                        if ui.button("Open").clicked() {
-                            log::debug!("Menu > Open");
-                            // self.open();
-                            ui.close_menu();
-                            
-                            ctx.request_repaint();
+                    // TODO: fix Obj save (saves faces with textures, not vertex normals)
+                    if let Some(res) = crate::ui::menu::ui(ui, control_flow) {
+                        // handle result
+                        match res {
+                            MenuResult::Open(path) => {
+                                if let Err(e) = self.model.load(path) {
+                                    log::error!("Failed to open part <{}>", e)
+                                }
+                            },
+                            MenuResult::Save(path) => {
+                                if let Err(e) = self.model.save(&path) {
+                                    log::error!("Failed to save part <{}>", e)
+                                }
+                            },
+                            MenuResult::ImportObj(path) => {
+                                if let Err(e) = self.model.load_obj(&path) {
+                                    log::error!("Failed to load Obj file part <{}>", e)
+                                }
+                            },
                         }
-        
-                        if ui.button("Save").clicked() {
-                            log::debug!("Menu > Save");
-                            // self.save();
-                            ui.close_menu();
-                            
-                            ctx.request_repaint();
-                        }
-        
-                        ui.menu_button("Import", |ui| {
-                            if ui.button("Waveform (.obj)").clicked() {
-                                log::debug!("Menu > Import > Waveform");
-                                // self.load();
-                                ui.close_menu();
-                                
-                                ctx.request_repaint();
-                            }
-                        });
-                        ui.menu_button("Export", |ui| {
-                            if ui.button("Stereolithography (.stl)").clicked() {
-                                eprintln!("impl stl export menu button");
-                                ui.close_menu();
-                            }
-                        });
-        
-                        if ui.button("Quit").clicked() {
-                            control_flow.set_exit();
-                        }
-                    });
+                        ctx.request_repaint();
+                    }
     
                     ui.horizontal(|ui| {
                         self.env.draw_toolbar(ui);
@@ -158,7 +96,7 @@ impl ApplicationState for State {
                     #[cfg(debug_assertions)]
                     ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
                         if ui.button("quick").clicked() {
-                            self.model.load_obj(&std::path::PathBuf::from(crate::dev::QUICK_MODEL));
+                            let _ = self.model.load_obj(&std::path::PathBuf::from(crate::dev::QUICK_MODEL));
                         }
                     });
                 });
