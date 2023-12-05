@@ -13,7 +13,7 @@ type Camera = Arc<Mutex<CameraState>>;
 
 pub enum ApplicationEnvironmentSwitch {
     EnterSketcher,
-    ExitSketcher
+    ExitSketcher(Option<crate::model::ModelEntity>),
 }
 
 pub enum ApplicationEnvironmentType {

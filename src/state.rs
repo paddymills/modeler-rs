@@ -93,7 +93,13 @@ impl ApplicationState for State {
                         if let Some(switch) = self.env.draw_toolbar(ui) {
                             *self.env.deref_mut() = match switch {
                                 ApplicationEnvironmentSwitch::EnterSketcher => ApplicationEnvironmentType::Sketching(self.env.deref().into()),
-                                ApplicationEnvironmentSwitch::ExitSketcher  => ApplicationEnvironmentType::Modeling(self.env.deref().into()),
+                                ApplicationEnvironmentSwitch::ExitSketcher(sketch) => {
+                                    if let Some(sketch) = sketch {
+                                        self.model.push(sketch);
+                                    }
+                                    
+                                    ApplicationEnvironmentType::Modeling(self.env.deref().into())
+                                },
                             };
                         }
                     });

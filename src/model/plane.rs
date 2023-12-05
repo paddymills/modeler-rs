@@ -5,7 +5,7 @@ use crate::prelude::Vertex;
 use super::{Point2d, Point3d};
 
 
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct Plane(Point3d);
 
 impl Plane {

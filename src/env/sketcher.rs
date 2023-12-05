@@ -1,8 +1,8 @@
 
 use winit::event::{WindowEvent, ElementState, MouseButton};
 
-use crate::prelude::*;
-use super::{ApplicationEnvironmentOps, Modeler, ApplicationEnvironmentSwitch, ApplicationEnvironmentType};
+use crate::{prelude::*, model::{ModelEntity, Sketch}};
+use super::{ApplicationEnvironmentOps, ApplicationEnvironmentSwitch, ApplicationEnvironmentType};
 
 #[derive(Debug, Default)]
 pub struct Sketcher {
@@ -18,7 +18,7 @@ impl Sketcher {
     }
 
     pub fn finalize(&self) {
-        todo!("finalize")
+        log::error!("finalize not implemented")
     }
 }
 
@@ -27,7 +27,9 @@ impl ApplicationEnvironmentOps for Sketcher {
         if ui.button("Finish sketch (right-click)").clicked() {
             self.finalize();
 
-            return Some(ApplicationEnvironmentSwitch::ExitSketcher);
+            return Some(ApplicationEnvironmentSwitch::ExitSketcher(Some(
+                ModelEntity::Sketch(Sketch::new())
+            )));
         }
 
         None
@@ -46,7 +48,7 @@ impl ApplicationEnvironmentOps for Sketcher {
                         else { self.points.push(self.mouse_pos.clone()) }
                     },
                     MouseButton::Middle => (),
-                    MouseButton::Right => self.finalize(),
+                    MouseButton::Right => (),
                     _ => ()
                 }
             },

@@ -31,6 +31,10 @@ impl Model {
         Self::default()
     }
 
+    pub fn push(&mut self, entity: ModelEntity) {
+        self.geometry.push(entity);
+    }
+
     pub fn entities(&self) -> Vec<String> {
         self.geometry.iter()
             .map(ToString::to_string)
