@@ -39,7 +39,12 @@ impl<S: ApplicationState + 'static> Application<S> {
     fn new() -> Self {
         let event_loop = EventLoopBuilder::new().build();
         let (window, display) = SimpleWindowBuilder::new()
-            .with_title(crate::config::TITLE)
+            .set_window_builder(
+                winit::window::WindowBuilder::new()
+                    .with_title(crate::config::TITLE)
+                    // TODO: center window
+                    .with_position(winit::dpi::PhysicalPosition::new(400.0, 200.0))
+            )
             .build(&event_loop);
 
         let state = S::new(&display, &window, &event_loop);
