@@ -4,7 +4,7 @@ pub mod application;
 pub mod camera;
 pub mod formats;
 pub mod model;
-pub mod modes;
+pub mod environment;
 pub mod shaders;
 pub mod state;
 

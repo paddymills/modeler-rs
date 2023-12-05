@@ -9,7 +9,7 @@ use winit::event::WindowEvent;
 use crate::prelude::*;
 use crate::{
     model::Model,
-    modes::ApplicationMode,
+    environment::*,
     shaders,
     camera::{self, CameraState},
     state::ApplicationContext
@@ -21,7 +21,7 @@ pub struct Application {
     pub camera: CameraState,
 
     model: Model,
-    mode: ApplicationMode,
+    pub mode: Box<dyn ApplicationMode>,
 
     status: String
 }
@@ -84,7 +84,7 @@ impl ApplicationContext for Application {
             program,
             camera: CameraState::new(),
             model: Model::new(),
-            mode: ApplicationMode::Modeling,
+            mode: Box::new(Modeling::new()),
             status: String::from("no model loaded"),
         }
     }
@@ -136,10 +136,7 @@ impl ApplicationContext for Application {
                 });
 
                 ui.horizontal(|ui| {
-                    if ui.button("+ Sketch").clicked() {
-                        self.camera.set_rotation((0.0, 0.0, 0.0));
-                        self.mode = ApplicationMode::Sketching;
-                    }
+                    self.mode.draw_toolbar(self, ui);
                 });
     
                 #[cfg(debug_assertions)]
