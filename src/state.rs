@@ -77,9 +77,7 @@ impl ApplicationState for State {
                     if let Some(res) = crate::ui::menu::ui(ui, control_flow) {
                         // handle result
                         match res {
-                            MenuResult::New => {
-                                self.model = Model::new();
-                            },
+                            MenuResult::New => self.model = Model::new(),
                             MenuResult::Open(path) => {
                                 if let Err(e) = self.model.load(path) {
                                     log::error!("Failed to open part <{}>", e)
