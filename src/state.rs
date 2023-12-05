@@ -29,6 +29,7 @@ pub struct State {
     env: env::ApplicationEnvironment,
     model: Model,
 
+    show_settings: bool,
     show_dialog: bool,
     dialog_vals: Vec<f32>,
     status: String,
@@ -52,6 +53,7 @@ impl ApplicationState for State {
             env: env::ApplicationEnvironment::new(),
             model: Model::new(),
 
+            show_settings: false,
             show_dialog: false,
             dialog_vals: vec![3.0, 4.0, 5.0],
             status: String::from("no model loaded"),
@@ -71,6 +73,13 @@ impl ApplicationState for State {
 
     fn draw_ui(&mut self, control_flow: &mut ControlFlow, window: &Window) {
         self.ui.run(&window, |ctx| {
+
+            if self.show_settings {
+                egui::Window::new("settings")
+                    .open(&mut self.show_settings)
+                    .show(ctx, |ui| ctx.settings_ui(ui));
+            }
+
             egui::TopBottomPanel::top("menu").show(&ctx, |ui| {
                 ui.horizontal(|ui| {
                     // TODO: fix Obj save (saves faces with textures, not vertex normals)
@@ -93,6 +102,9 @@ impl ApplicationState for State {
                                     log::error!("Failed to load Obj file part <{}>", e)
                                 }
                             },
+                            MenuResult::Settings => {
+                                self.show_settings = true;
+                            }
                         }
                         ctx.request_repaint();
                     }
@@ -204,6 +216,7 @@ impl ApplicationState for State {
 
     fn draw_frame(&mut self, display: &Display) {
         let mut frame = display.draw();
+
         // building the uniforms
         let uniforms = {
             let camera = self.env.camera.lock().unwrap();
@@ -241,7 +254,7 @@ impl ApplicationState for State {
             )
             .unwrap();
 
-        // draw egui header
+        // draw egui ui last so that render space does not overlap
         self.ui.paint(display, &mut frame);
 
         frame.finish().unwrap();

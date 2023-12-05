@@ -6,6 +6,7 @@ pub enum MenuResult {
     Open(PathBuf),
     Save(PathBuf),
     ImportObj(PathBuf),
+    Settings,
 }
 
 pub fn ui(ui: &mut egui::Ui, control_flow: &mut winit::event_loop::ControlFlow) -> Option<MenuResult> {
@@ -39,6 +40,10 @@ pub fn ui(ui: &mut egui::Ui, control_flow: &mut winit::event_loop::ControlFlow) 
                 ui.close_menu();
             }
         });
+
+        if ui.button("Settings").clicked() {
+            result = Some(MenuResult::Settings);
+        }
 
         if ui.button("Quit").clicked() {
             control_flow.set_exit();
