@@ -22,17 +22,18 @@ pub struct Model {
 
 impl Model {
     pub fn new() -> Self {
-        // Self {
-        //     geometry: vec![ModelEntity::Block(Block::two_points(Point3d { x: -1.0, y: -1.0, z: -1.0 }, Point3d { x: 1.0, y: 1.0, z: 1.0 }))],
+        Self {
+            // geometry: vec![ModelEntity::Block(Block::two_points(Point3d { x: -1.0, y: -1.0, z: -1.0 }, Point3d { x: 1.0, y: 1.0, z: 1.0 }))],
             
-        //     ..Default::default()
-        // }
+            ..Default::default()
+        }
 
-        Self::default()
+        // Self::default()
     }
 
     pub fn push(&mut self, entity: ModelEntity) {
         self.geometry.push(entity);
+        self.vb = None;
     }
 
     pub fn entities(&self) -> Vec<String> {

@@ -9,8 +9,10 @@ use winit::{
     window::Window,
 };
 
-use crate::env::{ApplicationEnvironmentSwitch, ApplicationEnvironmentType};
+use crate::env::ApplicationEnvironmentType;
+use crate::model::Block;
 use crate::prelude::*;
+use crate::ui::UiDrawResult;
 use crate::ui::menu::MenuResult;
 use crate::{
     env,
@@ -25,8 +27,10 @@ pub struct State {
     ui: EguiGlium,
     
     env: env::ApplicationEnvironment,
-    
     model: Model,
+
+    show_dialog: bool,
+    dialog_vals: Vec<f32>,
     status: String,
 }
 
@@ -47,6 +51,9 @@ impl ApplicationState for State {
             ui: EguiGlium::new(&display, &window, &event_loop),
             env: env::ApplicationEnvironment::new(),
             model: Model::new(),
+
+            show_dialog: false,
+            dialog_vals: vec![3.0, 4.0, 5.0],
             status: String::from("no model loaded"),
         }
     }
@@ -91,16 +98,25 @@ impl ApplicationState for State {
     
                     ui.horizontal(|ui| {
                         if let Some(switch) = self.env.draw_toolbar(ui) {
-                            *self.env.deref_mut() = match switch {
-                                ApplicationEnvironmentSwitch::EnterSketcher => ApplicationEnvironmentType::Sketching(self.env.deref().into()),
-                                ApplicationEnvironmentSwitch::ExitSketcher(sketch) => {
+                            let res = match switch {
+                                UiDrawResult::EnterSketcher => Some(ApplicationEnvironmentType::Sketching(self.env.deref().into())),
+                                UiDrawResult::ExitSketcher(sketch) => {
                                     if let Some(sketch) = sketch {
                                         self.model.push(sketch);
                                     }
                                     
-                                    ApplicationEnvironmentType::Modeling(self.env.deref().into())
+                                    Some(ApplicationEnvironmentType::Modeling(self.env.deref().into()))
                                 },
+                                UiDrawResult::ShowBlockDialog => {
+                                    self.show_dialog = true;
+
+                                    None
+                                }
                             };
+
+                            if let Some(newval) = res {
+                                *self.env.deref_mut() = newval;
+                            }
                         }
                     });
         
@@ -112,6 +128,44 @@ impl ApplicationState for State {
                     });
                 });
             });
+
+            if self.show_dialog {
+                let mut show = true;
+                egui::Window::new("dialog")
+                    .collapsible(false)
+                    .open(&mut self.show_dialog)
+                    .show(ctx, |ui| {
+                        egui::Grid::new("dialog_table")
+                            .num_columns(2)
+                            .striped(true)
+                            .show(ui, |ui| {
+                                ui.label("Length");
+                                ui.add(egui::DragValue::new(&mut self.dialog_vals[0]).speed(1.0));
+                                ui.end_row();
+
+                                ui.label("Width");
+                                ui.add(egui::DragValue::new(&mut self.dialog_vals[1]).speed(1.0));
+                                ui.end_row();
+
+                                ui.label("Height");
+                                ui.add(egui::DragValue::new(&mut self.dialog_vals[2]).speed(1.0));
+                                ui.end_row();
+                            });
+
+                        ui.separator();
+                        
+                        ui.horizontal(|ui| {
+                            if ui.button("Create Block").clicked() {
+                                let point = Point3d { x: self.dialog_vals[0], y: self.dialog_vals[1], z: self.dialog_vals[2] };
+                                self.model.push(crate::model::ModelEntity::Block(Block::origin_and_max(point)));
+
+                                show = false;
+                            }
+                        });
+                    });
+
+                self.show_dialog = show;
+            }
     
             // model history panel
             egui::SidePanel::left("toolbar").show(&ctx, |ui| {
@@ -150,19 +204,22 @@ impl ApplicationState for State {
     fn draw_frame(&mut self, display: &Display) {
         let mut frame = display.draw();
         // building the uniforms
-        let camera = self.env.camera.lock().unwrap();
-        let uniforms = uniform! {
-            persp_matrix: camera.get_perspective(),
-            view_matrix:  camera.get_view(),
-            rotx_matrix:  camera.get_x_rotation(),
-            roty_matrix:  camera.get_y_rotation(),
-            rotz_matrix:  camera.get_z_rotation(),
+        let uniforms = {
+            let camera = self.env.camera.lock().unwrap();
+
+            uniform! {
+                persp_matrix: camera.get_perspective(),
+                view_matrix:  camera.get_view(),
+                rotx_matrix:  camera.get_x_rotation(),
+                roty_matrix:  camera.get_y_rotation(),
+                rotz_matrix:  camera.get_z_rotation(),
+            }
         };
 
         // draw parameters
         let params = glium::DrawParameters {
             depth: glium::Depth {
-                test: glium::DepthTest::IfLess,
+                test: glium::DepthTest::IfLessOrEqual,
                 write: true,
                 ..Default::default()
             },

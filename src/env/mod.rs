@@ -9,12 +9,8 @@ pub use modeling::Modeler;
 pub use sketcher::Sketcher;
 
 use crate::camera::CameraState;
+use crate::ui::UiDrawResult;
 type Camera = Arc<Mutex<CameraState>>;
-
-pub enum ApplicationEnvironmentSwitch {
-    EnterSketcher,
-    ExitSketcher(Option<crate::model::ModelEntity>),
-}
 
 pub enum ApplicationEnvironmentType {
     Modeling(Modeler),
@@ -87,6 +83,6 @@ impl DerefMut for ApplicationEnvironment {
 pub trait ApplicationEnvironmentOps
     where Self: std::fmt::Debug
 {
-    fn draw_toolbar(&mut self, ui: &mut egui::Ui) -> Option<ApplicationEnvironmentSwitch>;
+    fn draw_toolbar(&mut self, ui: &mut egui::Ui) -> Option<UiDrawResult>;
     fn handle_window_event(&mut self, event: &winit::event::WindowEvent);
 }

@@ -1,6 +1,8 @@
 
 
-use super::{ApplicationEnvironmentOps, ApplicationEnvironmentSwitch, ApplicationEnvironmentType};
+use crate::ui::UiDrawResult;
+
+use super::{ApplicationEnvironmentOps, ApplicationEnvironmentType};
 
 #[derive(Debug)]
 pub struct Modeler {
@@ -14,12 +16,19 @@ impl Modeler {
 }
 
 impl ApplicationEnvironmentOps for Modeler {
-    fn draw_toolbar(&mut self, ui: &mut egui::Ui) -> Option<ApplicationEnvironmentSwitch> {
+    fn draw_toolbar(&mut self, ui: &mut egui::Ui) -> Option<UiDrawResult> {
         if ui.button("+ Sketch").clicked() {
             log::trace!("Add sketch selected");
             self.camera.lock().unwrap().set_rotation((0.0, 0.0, 0.0));
             
-            return Some(ApplicationEnvironmentSwitch::EnterSketcher);
+            return Some(UiDrawResult::EnterSketcher);
+        }
+
+        if ui.button("+ Block").clicked() {
+            log::trace!("Add block selected");
+            self.camera.lock().unwrap().set_rotation((0.0, 0.0, 0.0));
+            
+            return Some(UiDrawResult::ShowBlockDialog);
         }
 
         None

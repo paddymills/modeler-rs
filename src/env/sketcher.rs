@@ -1,8 +1,8 @@
 
 use winit::event::{WindowEvent, ElementState, MouseButton};
 
-use crate::{prelude::*, model::{ModelEntity, Sketch}};
-use super::{ApplicationEnvironmentOps, ApplicationEnvironmentSwitch, ApplicationEnvironmentType};
+use crate::{prelude::*, model::{ModelEntity, Sketch}, ui::UiDrawResult};
+use super::{ApplicationEnvironmentOps, ApplicationEnvironmentType};
 
 #[derive(Debug, Default)]
 pub struct Sketcher {
@@ -23,11 +23,11 @@ impl Sketcher {
 }
 
 impl ApplicationEnvironmentOps for Sketcher {
-    fn draw_toolbar(&mut self, ui: &mut egui::Ui) -> Option<ApplicationEnvironmentSwitch> {
+    fn draw_toolbar(&mut self, ui: &mut egui::Ui) -> Option<UiDrawResult> {
         if ui.button("Finish sketch (right-click)").clicked() {
             self.finalize();
 
-            return Some(ApplicationEnvironmentSwitch::ExitSketcher(Some(
+            return Some(UiDrawResult::ExitSketcher(Some(
                 ModelEntity::Sketch(Sketch::new())
             )));
         }

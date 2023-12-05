@@ -2,7 +2,7 @@
 use super::Point3d;
 use crate::prelude::*;
 
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct Block {
     origin: Point3d,
     dim: Point3d
@@ -11,6 +11,10 @@ pub struct Block {
 impl Block {
     pub fn two_points(p1: Point3d, p2: Point3d) -> Self {
         Self { origin: p1, dim: p2 }
+    }
+
+    pub fn origin_and_max(dim: Point3d) -> Self {
+        Self { dim, ..Default::default() }
     }
 
     pub fn points(&self) -> Vec<Point3d> {
@@ -35,8 +39,29 @@ impl Block {
 
 impl super::ModelEntityObject for Block {
     fn vertices(&self) -> Vec<Vertex> {
-        self.points().into_iter()
-            .map(Into::into)
-            .collect()
+        use itertools::Itertools;
+
+        log::debug!("calculating buffer for block");
+
+        let mut data = Vec::new();
+        let points = self.points();
+        let permutations = (0..points.len()).permutations(3);
+
+        for point_set in permutations {
+            let normal: Point3d = point_set
+                .clone().into_iter()
+                .map(|p| points[p])
+                .reduce(|acc, e| acc + e)
+                .unwrap() / 3f32;
+
+            let normal = normal.to_array();
+            log::debug!("normal: {:?}", normal);
+
+            for p in point_set {
+                data.push(Vertex { position: points[p].to_array(), normal, ..Default::default() });
+            }
+        }
+
+        data
     }
 }

@@ -1,4 +1,4 @@
-use std::ops::Add;
+use std::ops::{Add, Div};
 
 use super::Vertex;
 
@@ -48,8 +48,21 @@ impl Add for Point3d {
     }
 }
 
+impl Div<f32> for Point3d {
+    type Output = Self;
+    fn div(self, d: f32) -> Self::Output {
+        Self { x: self.x / d, y: self.y / d, z: self.z / d }
+    }
+}
+
 impl Into<Vertex> for Point3d {
     fn into(self) -> Vertex {
         Vertex { position: self.to_array(), ..Default::default() }
+    }
+}
+
+impl From<&[f32; 3]> for Point3d {
+    fn from(value: &[f32; 3]) -> Self {
+        Point3d { x: value[0], y: value[1], z: value[2] }
     }
 }

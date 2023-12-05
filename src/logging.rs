@@ -13,6 +13,7 @@ pub fn init() -> Result<(), fern::InitError> {
             ))
         })
         .level(log::LevelFilter::Debug)
+        .level_for("glium", log::LevelFilter::Off)
         .chain(std::io::stdout())
         .chain(fern::log_file("phobia.log")?)
         .apply()?;

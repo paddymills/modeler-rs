@@ -4,10 +4,12 @@ use crate::prelude::*;
 
 // Returns a vertex buffer that should be rendered as `TrianglesList`.
 pub fn load(data: &obj::Obj) -> Vec<Vertex> {
-    
+    load_data(&data.data)
+}
+
+pub fn load_data(data: &obj::ObjData) -> Vec<Vertex> {
     let mut vertex_data = Vec::new();
-    
-    let data = &data.data;
+
     for object in data.objects.iter() {
         for polygon in object.groups.iter().flat_map(|g| g.polys.iter()) {
             match polygon {

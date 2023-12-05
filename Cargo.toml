@@ -26,5 +26,6 @@ egui = "0.23.0"
 fern = "0.6.2"
 log = "0.4.20"
 chrono = "0.4.31"
+itertools = "0.12.0"
 
 
