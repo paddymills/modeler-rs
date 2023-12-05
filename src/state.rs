@@ -1,4 +1,6 @@
 
+use std::ops::{Deref, DerefMut};
+
 use egui_glium::EguiGlium;
 use glium::{uniform, Surface};
 
@@ -7,11 +9,11 @@ use winit::{
     window::Window,
 };
 
+use crate::env::{ApplicationEnvironmentSwitch, ApplicationEnvironmentType};
 use crate::prelude::*;
 use crate::ui::menu::MenuResult;
 use crate::{
     env,
-    camera::CameraState,
     application::ApplicationState,
     model::Model
 };
@@ -21,9 +23,8 @@ use crate::{
 pub struct State {
     program: glium::Program,
     ui: EguiGlium,
-    camera: CameraState,
     
-    env: Box<dyn env::ApplicationEnvironment>,
+    env: env::ApplicationEnvironment,
     
     model: Model,
     status: String,
@@ -44,20 +45,19 @@ impl ApplicationState for State {
         Self {
             program,
             ui: EguiGlium::new(&display, &window, &event_loop),
-            camera: CameraState::new(),
-            env: Box::new(env::Modeling::new()),
+            env: env::ApplicationEnvironment::new(),
             model: Model::new(),
             status: String::from("no model loaded"),
         }
     }
 
     fn update(&mut self) {
-        self.camera.update(crate::camera::UPDATE_DISTANCE);
+        self.env.update();
     }
 
     fn handle_window_event(&mut self, event: &winit::event::WindowEvent, _window: &winit::window::Window) {
         if !self.ui.on_event(&event).consumed {
-            self.camera.process_input(&event);
+            self.env.process_input(&event);
         }
         
     }
@@ -90,7 +90,12 @@ impl ApplicationState for State {
                     }
     
                     ui.horizontal(|ui| {
-                        self.env.draw_toolbar(ui);
+                        if let Some(switch) = self.env.draw_toolbar(ui) {
+                            *self.env.deref_mut() = match switch {
+                                ApplicationEnvironmentSwitch::EnterSketcher => ApplicationEnvironmentType::Sketching(self.env.deref().into()),
+                                ApplicationEnvironmentSwitch::ExitSketcher  => ApplicationEnvironmentType::Modeling(self.env.deref().into()),
+                            };
+                        }
                     });
         
                     #[cfg(debug_assertions)]
@@ -111,14 +116,21 @@ impl ApplicationState for State {
     
             egui::TopBottomPanel::bottom("statusbar").show(&ctx, |ui| {
                 ui.horizontal_centered(|ui| {
+                    let rotpos = match self.env.camera.lock() {
+                        Ok(camera) => (
+                            camera.rotation.0,
+                            camera.rotation.1,
+                            camera.rotation.2,
+                            camera.position.0,
+                            camera.position.1,
+                            camera.position.2,
+                        ),
+                        Err(_) => ( 0f32, 0f32, 0f32, 0f32, 0f32, 0f32, ),
+                    };
+
                     ui.label(&format!(
                         "🔄 <{:.2}, {:.2}, {:.2}> | ↔ <{:.2}, {:.2}, {:.2}>",
-                        self.camera.rotation.0,
-                        self.camera.rotation.1,
-                        self.camera.rotation.2,
-                        self.camera.position.0,
-                        self.camera.position.1,
-                        self.camera.position.2,
+                        rotpos.0, rotpos.1, rotpos.2, rotpos.3, rotpos.4, rotpos.5,
                     ));
     
                     ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
@@ -132,12 +144,13 @@ impl ApplicationState for State {
     fn draw_frame(&mut self, display: &Display) {
         let mut frame = display.draw();
         // building the uniforms
+        let camera = self.env.camera.lock().unwrap();
         let uniforms = uniform! {
-            persp_matrix: self.camera.get_perspective(),
-            view_matrix: self.camera.get_view(),
-            rotx_matrix: self.camera.get_x_rotation(),
-            roty_matrix: self.camera.get_y_rotation(),
-            rotz_matrix: self.camera.get_z_rotation(),
+            persp_matrix: camera.get_perspective(),
+            view_matrix:  camera.get_view(),
+            rotx_matrix:  camera.get_x_rotation(),
+            roty_matrix:  camera.get_y_rotation(),
+            rotz_matrix:  camera.get_z_rotation(),
         };
 
         // draw parameters
@@ -147,6 +160,9 @@ impl ApplicationState for State {
                 write: true,
                 ..Default::default()
             },
+
+            line_width: Some(5f32),
+
             ..Default::default()
         };
 

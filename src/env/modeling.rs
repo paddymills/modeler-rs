@@ -1,25 +1,43 @@
 
-// use super::Sketcher;
+
+use super::{ApplicationEnvironmentOps, ApplicationEnvironmentSwitch, ApplicationEnvironmentType};
 
 #[derive(Debug)]
-pub struct Modeling {}
+pub struct Modeler {
+    pub camera: super::Camera
+}
 
-impl Modeling {
-    pub fn new() -> Self {
-        Self {}
+impl Modeler {
+    pub fn new(camera: super::Camera) -> Self {
+        Self { camera }
     }
 }
 
-impl super::ApplicationEnvironment for Modeling {
-    fn draw_toolbar(&self, ui: &mut egui::Ui) {
+impl ApplicationEnvironmentOps for Modeler {
+    fn draw_toolbar(&mut self, ui: &mut egui::Ui) -> Option<ApplicationEnvironmentSwitch> {
         if ui.button("+ Sketch").clicked() {
-            log::trace!("Add sketch selected")
-            // app.camera.set_rotation((0.0, 0.0, 0.0));
-            // app.mode = Box::new(Sketcher::new());
+            log::trace!("Add sketch selected");
+            self.camera.lock().unwrap().set_rotation((0.0, 0.0, 0.0));
+            
+            return Some(ApplicationEnvironmentSwitch::EnterSketcher);
         }
+
+        None
     }
 
-    fn handle_window_event(&mut self, event: winit::event::WindowEvent) {
-        
+    fn handle_window_event(&mut self, event: &winit::event::WindowEvent) {
+        match self.camera.lock() {
+            Ok(mut camera) => camera.process_input(&event),
+            Err(e) => log::error!("Failed to lock camera to handle WindowEvent<{:?}> because `{}`", event, e)
+        }
+    }
+}
+
+impl From<&ApplicationEnvironmentType> for Modeler {
+    fn from(env: &ApplicationEnvironmentType) -> Self {
+        match env {
+            ApplicationEnvironmentType::Sketching(sketcher) => Self { camera: sketcher.camera.clone()},
+            _ => unimplemented!()
+        }
     }
 }

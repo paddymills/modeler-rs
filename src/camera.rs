@@ -29,21 +29,7 @@ pub struct CameraState {
 
 impl CameraState {
     pub fn new() -> CameraState {
-        CameraState {
-            width: 1024.0,
-            height: 768.0,
-
-            position: (0.0, 0.0, 0.025),
-            rotation: (0.0, 0.0, 0.0),
-            direction: (0.0, 0.0, -1.0),
-
-            moving: (0, 0, 0),
-            rotating: (0, 0, 0),
-
-            lmouse_held: false,
-            mmouse_held: false,
-            mouse_pos: PhysicalPosition::default()
-        }
+        Self::default()
     }
 
     fn normalize(&mut self) {
@@ -321,6 +307,26 @@ impl CameraState {
             },
             WindowEvent::Resized(size) => self.set_aspect_ratio( size.width as f32, size.height as f32 ),
             _ => ()
+        }
+    }
+}
+
+impl Default for CameraState {
+    fn default() -> Self {
+        Self {
+            width: 1024.0,
+            height: 768.0,
+
+            position: (0.0, 0.0, 0.025),
+            rotation: (0.0, 0.0, 0.0),
+            direction: (0.0, 0.0, -1.0),
+
+            moving: (0, 0, 0),
+            rotating: (0, 0, 0),
+
+            lmouse_held: false,
+            mmouse_held: false,
+            mouse_pos: PhysicalPosition::default()
         }
     }
 }
