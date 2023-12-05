@@ -273,11 +273,11 @@ impl CameraState {
                     // TODO: movement about axes, given current camera position
                     // x-movement about the x-axis
                     self.moving.0 = (x / x.abs() * -1.0) as i8;
-                    self.update(x.abs() * MOVE_MULTIPLIER);
+                    self.update(x.abs() * MOVE_MULTIPLIER / 5.0);
                     self.moving.0 = 0;
                     // y-movement about the z-axis
                     self.moving.2 = (y / y.abs()) as i8;
-                    self.update(y.abs() * MOVE_MULTIPLIER);
+                    self.update(y.abs() * MOVE_MULTIPLIER / 5.0);
                     self.moving.2 = 0;
                 }
                 
