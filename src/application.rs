@@ -3,7 +3,7 @@ use glium::backend::glutin::SimpleWindowBuilder;
 use winit::{
     event::{Event, WindowEvent},
     event_loop::{EventLoopBuilder, ControlFlow},
-    window::Window, dpi::PhysicalSize,
+    window::Window, dpi::{PhysicalSize, PhysicalPosition},
 };
 
 use crate::prelude::*;
@@ -39,12 +39,7 @@ impl<S: ApplicationState + 'static> Application<S> {
     fn new() -> Self {
         let event_loop = EventLoopBuilder::new().build();
         let (window, display) = SimpleWindowBuilder::new()
-            .set_window_builder(
-                winit::window::WindowBuilder::new()
-                    .with_title(crate::config::TITLE)
-                    // TODO: center window
-                    .with_position(winit::dpi::PhysicalPosition::new(400.0, 200.0))
-            )
+            .with_title(crate::config::TITLE)
             .build(&event_loop);
 
         let state = S::new(&display, &window, &event_loop);
@@ -62,8 +57,13 @@ impl<S: ApplicationState + 'static> Application<S> {
                 // set the window size (will call WindowEvent::Resized in the camera)
                 // this is a hack to correctly set the inital aspect ratio for the camera
                 Event::Resumed => {
+                    let mon = self.window.current_monitor().unwrap().size();
                     // TODO: cache window size so that last used window size persists
-                    let _ = self.window.set_inner_size(PhysicalSize { width: 800, height: 600 });
+                    let size = PhysicalSize { width: 800u32, height: 600u32 };
+                    let pos = PhysicalPosition { x: (mon.width - size.width) / 2, y: (mon.height - size.height) / 2 };
+
+                    let _ = self.window.set_inner_size(size);
+                    let _ = self.window.set_outer_position(pos);
                 },
                 Event::RedrawRequested(_) => {
                     self.state.update();
