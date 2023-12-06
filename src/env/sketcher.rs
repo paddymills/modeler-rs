@@ -28,7 +28,7 @@ impl ApplicationEnvironmentOps for Sketcher {
             self.finalize();
 
             return Some(UiDrawResult::ExitSketcher(Some(
-                ModelEntity::Sketch(Sketch::new())
+                ModelEntity::Sketch(Sketch::with_points(self.points.clone()))
             )));
         }
 

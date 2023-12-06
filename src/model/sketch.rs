@@ -13,6 +13,10 @@ impl Sketch {
     pub fn new() -> Self {
         Self::default()
     }
+
+    pub fn with_points(points: Vec<Point2d>) -> Self {
+        Self { points, ..Default::default() }
+    }
 }
 
 impl super::ModelEntityObject for Sketch {
