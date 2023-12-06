@@ -11,7 +11,9 @@ pub enum ModelEntity {
     Sketch(Sketch),
 
     // TODO: add anchor
-    Block(Block)
+    Block(Block),
+
+    Extrude(Extrude),
 }
 
 impl ModelEntity {
@@ -21,7 +23,9 @@ impl ModelEntity {
         match self {
             ImportedModel(obj) => wavefront::load(obj),
             Block(bl) => bl.vertices(),
-            _ => todo!()
+            Sketch(sk) => sk.vertices(),
+            Extrude(e) => e.vertices(),
+            // _ => todo!()
         }
     }
 }
@@ -35,6 +39,7 @@ impl ToString for ModelEntity {
             ImportedModel(_) => "ImportedModel",
             Sketch(_) => "Sketch",
             Block(_) => "Block",
+            Extrude(_) => "Extrude"
         }.into()
     }
 }

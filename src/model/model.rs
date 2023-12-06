@@ -1,7 +1,8 @@
 
 use std::{
     fs::File,
-    path::PathBuf
+    path::PathBuf,
+    ops::Deref
 };
 
 use glium::{
@@ -98,5 +99,13 @@ impl Model {
 
         // previous lines ensure this will not panic
         self.vb.as_ref().unwrap()
+    }
+}
+
+impl Deref for Model {
+    type Target = Vec<ModelEntity>;
+    
+    fn deref(&self) -> &Self::Target {
+        &self.geometry
     }
 }

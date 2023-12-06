@@ -10,7 +10,7 @@ use winit::{
 };
 
 use crate::env::ApplicationEnvironmentType;
-use crate::model::Block;
+use crate::model::{Block, ModelEntity, Extrude};
 use crate::prelude::*;
 use crate::ui::UiDrawResult;
 use crate::ui::menu::MenuResult;
@@ -188,10 +188,20 @@ impl ApplicationState for State {
                         .striped(true)
                         .num_columns(2)
                         .show(ui, |ui| {
-                            for geo in self.model.entities() {
-                                ui.label("⊟");
-                                ui.label(geo);
+                            let mut add_extrude = None;
+                            for geo in self.model.deref() {
+                                // ui.label("⊟");
+                                if ui.button("⊞").clicked() {
+                                    if let ModelEntity::Sketch(sk) = geo {
+                                        add_extrude = Some(Extrude { sketch: sk.clone(), dist: 8f32 });
+                                    }
+                                }
+                                ui.label(geo.to_string());
                                 ui.end_row();
+                            }
+
+                            if let Some(extrude) = add_extrude {
+                                self.model.push(ModelEntity::Extrude(extrude));
                             }
                         });
                 });
