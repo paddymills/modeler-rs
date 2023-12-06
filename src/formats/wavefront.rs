@@ -1,25 +1,15 @@
 
-use glium::{
-    implement_vertex,
-    Display,
-    glutin::surface::WindowSurface,
-    vertex::VertexBuffer,
-};
+use crate::prelude::*;
+
 
 // Returns a vertex buffer that should be rendered as `TrianglesList`.
-pub fn load(display: &Display<WindowSurface>, data: &obj::Obj) -> glium::vertex::VertexBufferAny {
-    #[derive(Copy, Clone)]
-    struct Vertex {
-        position: [f32; 3],
-        normal: [f32; 3],
-        texture: [f32; 2],
-    }
+pub fn load(data: &obj::Obj) -> Vec<Vertex> {
+    load_data(&data.data)
+}
 
-    implement_vertex!(Vertex, position, normal, texture);
-    
+pub fn load_data(data: &obj::ObjData) -> Vec<Vertex> {
     let mut vertex_data = Vec::new();
-    
-    let data = &data.data;
+
     for object in data.objects.iter() {
         for polygon in object.groups.iter().flat_map(|g| g.polys.iter()) {
             match polygon {
@@ -32,16 +22,19 @@ pub fn load(display: &Display<WindowSurface>, data: &obj::Obj) -> glium::vertex:
                         let texture = texture.unwrap_or([0.0, 0.0]);
                         let normal = normal.unwrap_or([0.0, 0.0, 0.0]);
 
-                        vertex_data.push(Vertex {
+                        let vertex = Vertex {
                             position,
                             normal,
                             texture,
-                        })
+                        };
+
+                        log::debug!("adding {:?}", vertex);
+                        vertex_data.push(vertex)
                     }
                 },
             }
         }
     }
 
-    VertexBuffer::new(display, &vertex_data).unwrap().into()
+    vertex_data
 }

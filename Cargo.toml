@@ -9,10 +9,11 @@ edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
+default-run = "phobia"
+
 [dependencies]
 glutin = "0.31"
 glutin-winit = "0.4"
-# glium = { version = "0.33", git = "https://github.com/glium/glium" }
 glium = "0.33.0"
 winit = "0.28"
 
@@ -20,5 +21,11 @@ obj = { version = "0.10", features = ["genmesh"] }
 native-dialog = "0.7.0"
 egui_glium = "0.23.0"
 egui = "0.23.0"
-# egui_glium = { version = "0.23.0", git = "https://github.com/paddymills/egui_glium" }
-# egui = { version = "0.23.0", git = "https://github.com/paddymills/egui" }
+
+# logging
+fern = "0.6.2"
+log = "0.4.20"
+chrono = "0.4.31"
+itertools = "0.12.0"
+
+

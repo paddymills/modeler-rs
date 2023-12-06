@@ -1,10 +1,18 @@
 
 
-pub mod application;
+mod application;
+mod state;
+pub use application::Application;
+pub use state::State;
+
+pub mod camera;
+pub mod env;
 pub mod formats;
+pub mod logging;
+pub mod prelude;
 pub mod model;
 pub mod shaders;
-pub mod support;
+pub mod ui;
 
 // TODO: upgrade winit
 //  because of shared dependencies, this requires egui, glium and egui_glium
@@ -14,8 +22,11 @@ pub mod config {
     pub const TITLE: &str = "Phobia";
 }
 
-// TODO: prelude for crate level types (i.e., Display)
-pub mod prelude {}
+
+#[cfg(debug_assertions)]
+pub(crate) mod dev {
+    pub const QUICK_MODEL: &str = "models/twocubes_blender.obj";
+}
 
 // TODO: theme colors
 pub mod theme {}
