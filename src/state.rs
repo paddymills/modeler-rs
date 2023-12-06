@@ -181,11 +181,20 @@ impl ApplicationState for State {
             }
     
             // model history panel
-            egui::SidePanel::left("toolbar").show(&ctx, |ui| {
-                for geo in self.model.entities() {
-                    ui.label(geo);
-                }
-            });
+            egui::Window::new("Model History")
+                .anchor(egui::Align2::LEFT_TOP, (0., 0.))
+                .show(ctx, |ui| {
+                    egui::Grid::new("model_history_itmes")
+                        .striped(true)
+                        .num_columns(2)
+                        .show(ui, |ui| {
+                            for geo in self.model.entities() {
+                                ui.label("⊟");
+                                ui.label(geo);
+                                ui.end_row();
+                            }
+                        });
+                });
     
             egui::TopBottomPanel::bottom("statusbar").show(&ctx, |ui| {
                 ui.horizontal_centered(|ui| {
